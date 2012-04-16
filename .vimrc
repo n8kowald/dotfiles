@@ -9,6 +9,8 @@ set smartindent    " happy auto indenting
 set ignorecase
 set syntax=on
 
+set splitright "place new split in the right hand side
+
 " toggle nice wrapping and movement mode
 " taken from http://vim.wikia.com/wiki/VimTip38
 " press "\w" to turn it on or off.
