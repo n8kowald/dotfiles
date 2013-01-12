@@ -3,13 +3,13 @@ set nocompatible   " stops vim from behaving in a vi compatible way
 set tabstop=4      " how wide the tab is
 set softtabstop=4  " num of spaces a tab counts for when <Tab> or <BS>
 set shiftwidth=4   " spaces to use for (auto)indent
-set noexpandtab    " use tabs
 set autoindent     " copy indent from current line
 set smartindent    " happy auto indenting
+set noexpandtab    " use tabs
 
 set ignorecase     " case-insensitive searching
-set filetype on    " filetype detection
-set syntax on      " syntax highlighting on
+set filetype=on    " filetype detection
+set syntax=on      " syntax highlighting on
 set splitright 	   " place new split in the right hand side
 set hlsearch       " highlight searched phrases.
 set incsearch      " highlight as you search
@@ -18,12 +18,12 @@ colorscheme jellybeans
 
 " set the 't_Co' option in vim to 256 to override the terminfo value
 if &term == "xterm"
-    set t_Co=256
+	set t_Co=256
 endif
 
 " Source the vimrc file after saving it
 if has("autocmd")
-  autocmd bufwritepost .vimrc source $MYVIMRC
+	autocmd bufwritepost .vimrc source $MYVIMRC
 endif
 
 " toggle nice wrapping and movement mode
@@ -36,39 +36,39 @@ set nowrap
 noremap <silent> <Leader>w :call ToggleWrap()<CR>
 
 " define the function to toggle the wrapping:
-function ToggleWrap()
- if &wrap
-  echo "Wrap OFF"
-  setlocal nowrap
-  set virtualedit=all
-  silent! nunmap <buffer> <Up>
-  silent! nunmap <buffer> <Down>
-  silent! nunmap <buffer> <Home>
-  silent! nunmap <buffer> <End>
-  silent! iunmap <buffer> <Up>
-  silent! iunmap <buffer> <Down>
-  silent! iunmap <buffer> <Home>
-  silent! iunmap <buffer> <End>
- else
-  echo "Wrap ON"
-  setlocal wrap linebreak nolist
-  set virtualedit=
-  setlocal display+=lastline
-  noremap  <buffer> <silent> <Up>   gk
-  noremap  <buffer> <silent> <Down> gj
-  noremap  <buffer> <silent> <Home> g<Home>
-  noremap  <buffer> <silent> <End>  g<End>
-  inoremap <buffer> <silent> <Up>   <C-o>gk
-  inoremap <buffer> <silent> <Down> <C-o>gj
-  inoremap <buffer> <silent> <Home> <C-o>g<Home>
-  inoremap <buffer> <silent> <End>  <C-o>g<End>
- endif
+function! ToggleWrap()
+	if &wrap
+		echo "Wrap OFF"
+		setlocal nowrap
+		set virtualedit=all
+		silent! nunmap <buffer> <Up>
+		silent! nunmap <buffer> <Down>
+		silent! nunmap <buffer> <Home>
+		silent! nunmap <buffer> <End>
+		silent! iunmap <buffer> <Up>
+		silent! iunmap <buffer> <Down>
+		silent! iunmap <buffer> <Home>
+		silent! iunmap <buffer> <End>
+	else
+		echo "Wrap ON"
+		setlocal wrap linebreak nolist
+		set virtualedit=
+		setlocal display+=lastline
+		noremap  <buffer> <silent> <Up>   gk
+		noremap  <buffer> <silent> <Down> gj
+		noremap  <buffer> <silent> <Home> g<Home>
+		noremap  <buffer> <silent> <End>  g<End>
+		inoremap <buffer> <silent> <Up>   <C-o>gk
+		inoremap <buffer> <silent> <Down> <C-o>gj
+		inoremap <buffer> <silent> <Home> <C-o>g<Home>
+		inoremap <buffer> <silent> <End>  <C-o>g<End>
+	endif
 endfunction
 
 function! TabSpacesON()
- set list
-	set listchars=tab:>·,trail:·,nbsp:·
-	endfunction
+	set list
+		set listchars=tab:>·,trail:·,nbsp:·
+		endfunction
 
 function! TabSpacesOFF()
 	set nolist
@@ -78,17 +78,17 @@ nnoremap <f4> :call TabSpacesON()<cr>
 nnoremap <f5> :call TabSpacesOFF()<cr>
 
 function! s:VSetSearch()
-  let temp = @@
-  norm! gvy
-  let @/ = '\V' . substitute(escape(@@, '\''), '\n', '\\n', 'g')
-  let @@ = temp
+	let temp = @@
+	norm! gvy
+	let @/ = '\V' . substitute(escape(@@, '\''), '\n', '\\n', 'g')
+	let @@ = temp
 endfunction
 
 vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
 
 "set diffexpr=MyDiff()
-function MyDiff()
+function! MyDiff()
   let opt = '-a --binary '
   if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
   if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
