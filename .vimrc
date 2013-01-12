@@ -1,4 +1,4 @@
-set nocompatible   " stops vim from behaving in a vi compatible way
+"set nocompatible   " stops vim from behaving in a vi compatible way
 
 set tabstop=4      " how wide the tab is
 set softtabstop=4  " num of spaces a tab counts for when <Tab> or <BS>
@@ -8,18 +8,18 @@ set smartindent    " happy auto indenting
 set noexpandtab    " use tabs
 
 set ignorecase     " case-insensitive searching
-set filetype=on    " filetype detection
-set syntax=on      " syntax highlighting on
 set splitright 	   " place new split in the right hand side
 set hlsearch       " highlight searched phrases.
 set incsearch      " highlight as you search
-
-colorscheme jellybeans
+filetype on        " filetype detection
+syntax enable      " syntax highlighting on
 
 " set the 't_Co' option in vim to 256 to override the terminfo value
 if &term == "xterm"
 	set t_Co=256
 endif
+
+colorscheme jellybeans
 
 " Source the vimrc file after saving it
 if has("autocmd")
