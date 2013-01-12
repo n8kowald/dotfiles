@@ -1,7 +1,7 @@
-## Vim Files
+## Dotfiles
 
-### Configuration
+I symlink my .vimrc using
+ln -s ~/dotfiles/.vimrc ~/.vimrc
+
+### Vim
 * .vimrc
-
-### Colour Scheme
-* Jellybeans
