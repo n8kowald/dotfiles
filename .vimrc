@@ -1,15 +1,30 @@
-" tabs
+set nocompatible   " stops vim from behaving in a vi compatible way
+
 set tabstop=4      " how wide the tab is
 set softtabstop=4  " num of spaces a tab counts for when <Tab> or <BS>
 set shiftwidth=4   " spaces to use for (auto)indent
-"set noexpandtab   " screw spaces, i like \t
-set expandtab
+set noexpandtab    " use tabs
 set autoindent     " copy indent from current line
 set smartindent    " happy auto indenting
-set ignorecase
-set syntax=on
 
-set splitright "place new split in the right hand side
+set ignorecase     " case-insensitive searching
+set filetype on    " filetype detection
+set syntax on      " syntax highlighting on
+set splitright 	   " place new split in the right hand side
+set hlsearch       " highlight searched phrases.
+set incsearch      " highlight as you search
+
+colorscheme jellybeans
+
+" set the 't_Co' option in vim to 256 to override the terminfo value
+if &term == "xterm"
+    set t_Co=256
+endif
+
+" Source the vimrc file after saving it
+if has("autocmd")
+  autocmd bufwritepost .vimrc source $MYVIMRC
+endif
 
 " toggle nice wrapping and movement mode
 " taken from http://vim.wikia.com/wiki/VimTip38
@@ -65,7 +80,7 @@ nnoremap <f5> :call TabSpacesOFF()<cr>
 function! s:VSetSearch()
   let temp = @@
   norm! gvy
-  let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
+  let @/ = '\V' . substitute(escape(@@, '\''), '\n', '\\n', 'g')
   let @@ = temp
 endfunction
 
@@ -89,7 +104,7 @@ function MyDiff()
       let cmd = '""' . $VIMRUNTIME . '\diff"'
       let eq = '"'
     else
-      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '''"') . '\diff"'
     endif
   else
     let cmd = $VIMRUNTIME . '\diff'
@@ -174,4 +189,4 @@ function! SeekTrailingWhiteSpace()
 endfunction
 
 nnoremap <f2> :call SeekTrailingWhiteSpace()<cr>
-nnoremap <f3> :call SeekIndentWarningOccurrence()<cr>
+nnoremap <f3> :call SeekIndentWarningOccurrence()<cr>")"
