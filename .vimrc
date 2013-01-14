@@ -1,18 +1,18 @@
 "set nocompatible   " stops vim from behaving in a vi compatible way
 
-set tabstop=4      " how wide the tab is
-set softtabstop=4  " num of spaces a tab counts for when <Tab> or <BS>
-set shiftwidth=4   " spaces to use for (auto)indent
-set autoindent     " copy indent from current line
-set smartindent    " happy auto indenting
-set noexpandtab    " use tabs
+set tabstop=4		" how wide the tab is
+set softtabstop=4	" num of spaces a tab counts for when <Tab> or <BS>
+set shiftwidth=4	" spaces to use for (auto)indent
+set autoindent		" copy indent from current line
+set smartindent		" happy auto indenting
+set noexpandtab		" use tabs
 
-set ignorecase     " case-insensitive searching
-set splitright 	   " place new split in the right hand side
-set hlsearch       " highlight searched phrases.
-set incsearch      " highlight as you search
-filetype on        " filetype detection
-syntax enable      " syntax highlighting on
+set ignorecase		" case-insensitive searching
+set splitright		" place new split in the right hand side
+set hlsearch		" highlight searched phrases.
+set incsearch		" highlight as you search
+filetype on			" filetype detection
+syntax enable		" syntax highlighting on
 
 " set the 't_Co' option in vim to 256 to override the terminfo value
 if &term == "xterm"
@@ -67,7 +67,7 @@ endfunction
 
 function! TabSpacesON()
 	set list
-		set listchars=tab:>Â·,trail:Â·,nbsp:Â·
+		set listchars=tab:>·,trail:·,nbsp:·
 		endfunction
 
 function! TabSpacesOFF()
@@ -89,33 +89,32 @@ vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
 
 "set diffexpr=MyDiff()
 function! MyDiff()
-  let opt = '-a --binary '
-  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-  let arg1 = v:fname_in
-  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-  let arg2 = v:fname_new
-  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-  let arg3 = v:fname_out
-  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-  let eq = ''
-  if $VIMRUNTIME =~ ' '
-    if &sh =~ '\<cmd'
-      let cmd = '""' . $VIMRUNTIME . '\diff"'
-      let eq = '"'
-    else
-      let cmd = substitute($VIMRUNTIME, ' ', '" ', '''"') . '\diff"'
-    endif
-  else
-    let cmd = $VIMRUNTIME . '\diff'
-  endif
-  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
-endfunction
-
+	let opt = '-a --binary '
+	if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+	if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+	let arg1 = v:fname_in
+	if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+	let arg2 = v:fname_new
+	if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+	let arg3 = v:fname_out
+	if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+	let eq = ''
+	if $VIMRUNTIME =~ ' '
+		if &sh =~ '\<cmd'
+		let cmd = '""' . $VIMRUNTIME . '\diff"'
+		let eq = '"'
+		else
+		let cmd = substitute($VIMRUNTIME, ' ', '" ', '''"') . '\diff"'
+		endif
+	else
+		let cmd = $VIMRUNTIME . '\diff'
+	endif
+	silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+	endfunction
 
 set laststatus=2
 
-set statusline=\ %t\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]%h%m%r%y%=%c,%l/%L\ %P\ 
+set statusline=\ %t\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]%h%m%r%y%=%c,%l/%L\ %P\
 set statusline+=%#error#
 set statusline+=%{StatuslineTrailingSpaceWarning()}
 set statusline+=%*
@@ -130,18 +129,18 @@ autocmd cursorhold,bufwritepost * unlet! b:statusline_tab_warning
 "return '[mixed-indenting]' if spaces and tabs are used to indent
 "return an empty string if everything is fine
 function! StatuslineTabWarning()
-    if !exists("b:statusline_tab_warning")
-        let tabs = search('^\t', 'nw') != 0
-        let spaces = search('^ ', 'nw') != 0
-        if tabs && spaces
-            let b:statusline_tab_warning =  '[mixed-indenting]'
-        elseif (spaces && !&et) || (tabs && &et)
-            let b:statusline_tab_warning = '[&et]'
-        else
-            let b:statusline_tab_warning = ''
-        endif
-    endif
-    return b:statusline_tab_warning
+	if !exists("b:statusline_tab_warning")
+		let tabs = search('^\t', 'nw') != 0
+		let spaces = search('^ ', 'nw') != 0
+		if tabs && spaces
+			let b:statusline_tab_warning =  '[mixed-indenting]'
+		elseif (spaces && !&et) || (tabs && &et)
+			let b:statusline_tab_warning = '[&et]'
+		else
+			let b:statusline_tab_warning = ''
+		endif
+	endif
+	return b:statusline_tab_warning
 endfunction
 
 
@@ -151,14 +150,14 @@ autocmd cursorhold,bufwritepost * unlet! b:statusline_trailing_space_warning
 "return '[\s]' if trailing white space is detected
 "return '' otherwise
 function! StatuslineTrailingSpaceWarning()
-    if !exists("b:statusline_trailing_space_warning")
-        if search('\s\+$', 'nw') != 0
-            let b:statusline_trailing_space_warning = '[\s]'
-        else
-            let b:statusline_trailing_space_warning = ''
-        endif
-    endif
-    return b:statusline_trailing_space_warning
+	if !exists("b:statusline_trailing_space_warning")
+		if search('\s\+$', 'nw') != 0
+			let b:statusline_trailing_space_warning = '[\s]'
+		else
+			let b:statusline_trailing_space_warning = ''
+		endif
+	endif
+	return b:statusline_trailing_space_warning
 endfunction
 
 " seek out ^[\t ] based on whether expandtabs (&et) is set
@@ -167,25 +166,25 @@ endfunction
 " then it will go to all ^\t, and all ^<space> when otherwise. IE
 " it won't do this per file, but per your setting
 function! SeekIndentWarningOccurrence()
-    if (!&et)
-        /^
-    elseif (&et)
-        /^\t
-    endif
-    exe "normal 0"
+	if (!&et)
+		/^
+	elseif (&et)
+		/^\t
+	endif
+	exe "normal 0"
 endfunction
 
 function! SeekTrailingWhiteSpace()
-    let [nws_line, nws_col] = searchpos('\s\+$', 'nw')
-    if ( nws_line != 0 && nws_col != 0 )
-        exe "normal ".nws_line."G"
-        " This would be nicer, but | doesn't seem to collapse \t in to 1 col?
-        " exe "normal ".nws_col."|"
-        " so i'll do this instead :(  Might be a better way
-        " this won't work if l has been mapped to something else
-        exe "normal 0"
-        exe "normal ".(nws_col-1)."l"
-    endif
+	let [nws_line, nws_col] = searchpos('\s\+$', 'nw')
+	if ( nws_line != 0 && nws_col != 0 )
+		exe "normal ".nws_line."G"
+		" This would be nicer, but | doesn't seem to collapse \t in to 1 col?
+		" exe "normal ".nws_col."|"
+		" so i'll do this instead :(  Might be a better way
+		" this won't work if l has been mapped to something else
+		exe "normal 0"
+		exe "normal ".(nws_col-1)."l"
+	endif
 endfunction
 
 nnoremap <f2> :call SeekTrailingWhiteSpace()<cr>
