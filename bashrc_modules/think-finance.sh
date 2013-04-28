@@ -326,7 +326,7 @@ function commitCode()
         echo
 	    if [ $# -eq 0 ]
         then
-            read -p "Enter your commit comment (if defect: add ticket no.): " COMMENT
+          read -p "Enter your commit comment (if defect: add ticket no.): " COMMENT
 
 		    COMMIT_COMMENT="#$BRANCH_NO comment: $COMMENT"
             # If Developer name and reviewboard id is not blank add it to the commit message
@@ -701,7 +701,7 @@ function getRevisionCMD()
     REV_ARRAY=($REV_RANGE)
     if [[ ${#REV_ARRAY[@]} -eq 2 ]]
     then
-        # Annoyingly, you have to specify REV-1 if you want that REV to be merged.
+        # You have to specify REV-1 if you want that REV to be merged.
         FIRST_REV=${REV_ARRAY[0]}
         ((FIRST_REV--))
         REV_RANGE=$FIRST_REV:${REV_ARRAY[1]}
@@ -826,6 +826,8 @@ function rebaseline()
         return 0
     fi
 }
+export -f rebaseline
+alias rb='rebaseline'
 
 # Thanks to Adam Atkins for this sexy function
 function findBranch()
@@ -921,7 +923,6 @@ export -f createPostReviewWithInfo
 alias ccr='createPostReviewWithInfo'
 
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
-export SVN_EDITOR=vim
 
 # source custom bash autocompletions
 if [ -f /etc/bash_completion.d/sb ]; then
