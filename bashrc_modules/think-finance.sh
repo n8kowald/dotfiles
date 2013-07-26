@@ -146,7 +146,7 @@ function commitCode() {
 	fi
 
 	# Prompt about PHP Code Sniffer if that exists
-	if [[ -z $(type phpcs | grep 'not found') ]] 
+	if type -p phpcs > /dev/null;
 	then
 		PHP_FILES=$(echo $STATUS | tr ' ' '\n' | grep -E '*.php')
 		NO_FILES=$(echo $PHP_FILES | wc -l)
@@ -158,18 +158,24 @@ function commitCode() {
 				then
 					# Convert newlines to spaces
 					ssv=$(echo $PHP_FILES | tr '\n' ' ')
+					FAILED=0
 					for f in $ssv
 					do
 						OUTPUT=$(phpcs $f | tee /dev/tty)
 						ERRORS=$(echo $OUTPUT | grep 'ERROR')
 						if [[ $ERRORS ]]
 						then 
-							printf "$MSG_FAIL Code failed coding standards check. Fix, then recommit.\n"
-							return 0
+							FAILED=1
 						fi
 					done
 					# Success
-					printf "${GREEN}Success! Code meets the coding standard.${NORMAL}\n\n"
+					if [[ $FAILED -eq 1 ]]
+					then
+						printf "$MSG_FAIL Code failed coding standards check. Fix, then recommit.\n"
+						return 0
+					else
+						printf "${GREEN}Success! Code meets the coding standard.${NORMAL}\n\n"
+					fi
 
 				fi
 		fi
