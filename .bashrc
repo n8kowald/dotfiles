@@ -21,7 +21,7 @@ REVERSE=$(tput smso)
 UNDERLINE=$(tput smul)
 
 # Source bash modules
-for script in bashrc_scripts/*.sh
+for script in ~/dotfiles/bashrc_modules/*.sh
 	do
 	# check if the script is executable
 	if [ -x "${script}" ]; then
