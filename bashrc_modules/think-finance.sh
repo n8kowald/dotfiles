@@ -8,9 +8,9 @@
 EXAMPLE_BRANCH="201982_branch_name_1"
 MSG_USAGE="${YELLOW}Usage:${NORMAL}"
 
-# Source private variables - should be in the same directory
-if [ -f think-finance-private.sh ]; then
-	source think-finance-private.sh
+# Source private variables
+if [ -f ~/dotfiles/bashrc_modules/think-finance-private.sh ]; then
+	source ~/dotfiles/bashrc_modules/think-finance-private.sh
 else
 	printf '[${RED}Error${NORMAL}] Required Think Finance variables not found.'
 	return 0
