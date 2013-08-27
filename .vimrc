@@ -11,8 +11,8 @@ set ignorecase		" case-insensitive searching
 set splitright		" place new split in the right hand side
 set hlsearch		" highlight searched phrases.
 set incsearch		" highlight as you search
-filetype on			" filetype detection
-syntax enable		" syntax highlighting on
+filetype plugin indent on			" filetype detection
+syntax on		" syntax highlighting on
 
 " set the 't_Co' option in vim to 256 to override the terminfo value
 if &term == "xterm"
@@ -189,3 +189,16 @@ endfunction
 
 nnoremap <f2> :call SeekTrailingWhiteSpace()<cr>
 nnoremap <f3> :call SeekIndentWarningOccurrence()<cr>")"
+
+" Changes plugin
+:let g:changes_vcs_check=1
+:let g:changes_vcs_system='svn'
+:let g:changes_autocmd=1
+
+" NERDTree plugin
+:let g:NERDTreeDirArrows=0
+
+" Disable syntastic
+let g:pathogen_disabled = ['syntastic']
+
+call pathogen#infect()
