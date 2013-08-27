@@ -112,7 +112,7 @@ alias wbu='getBranchURL'
 function getBranchURL {
 	BRANCH=$(getBranchName)
 	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
-	echo ${URL_TICKET_ROOT}${BRANCH_NO}
+	echo ${URL_TP_TICKET_ROOT}${BRANCH_NO}
 }
 export -f getBranchURL
 
@@ -131,7 +131,7 @@ function commitCode() {
 	svn status
 
 	printf "\n"
-	read -p "Commit the above files to ${YELLOW}$BRANCH${NORMAL}? (y/n) "
+	read -p "Commit theses files to ${YELLOW}$BRANCH${NORMAL}? (y/n) "
 
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
@@ -139,14 +139,14 @@ function commitCode() {
 		printf "\n"
 		read -p "Enter your commit comment: " COMMENT
 		COMMIT_COMMENT="#$BRANCH_NO comment: $COMMENT" 
-		printf "\n$COMMIT_COMMENT\n\n"
+		printf "${CYAN}\n$COMMIT_COMMENT\n\n"
 
-		read -p "Is this comment okay? (y/n) "
+		read -p "Commit with the following comment? (y/n) "
 		if [[ $REPLY =~ ^[Yy]$ ]]
 		then 
-			printf "\n\n"
+			printf "\n"
 			OUTPUT=$(svn commit -m "$COMMIT_COMMENT" | tee /dev/tty)
-			printf "\n${GREEN}Success!${NORMAL} Make sure you update the TP ticket:\n${URL_TICKET_ROOT}${BRANCH_NO}\n\n"
+			printf "\n${GREEN}Success!${NORMAL} Make sure you update the TP ticket:\n${URL_TP_TICKET_ROOT}${BRANCH_NO}\n\n"
 			printf "TP ticket comment:\n"
 			# Branch URL
 			printf "Branch: $(svn info | grep 'URL: ' | grep -oEi 'http.+')\n"
@@ -203,7 +203,7 @@ function newBranch() {
 	BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
 	read -p "Enter a description of this branch: " DESCRIPTION
 	BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION"
-	printf "\n$BRANCH_COMMENT\n\n"
+	printf "${CYAN}\n$BRANCH_COMMENT\n\n"
 
 	read -p "Create a new branch with this commit comment? (y/n) "
 	if [[ $REPLY =~ ^[Yy]$ ]]

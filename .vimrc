@@ -195,7 +195,7 @@ match ErrorMsg '\%>80v.\+'
 " Changes plugin
 :let g:changes_vcs_check=1
 :let g:changes_vcs_system='svn'
-:let g:changes_autocmd=1
+":let g:changes_autocmd=1
 
 " NERDTree plugin
 :let g:NERDTreeDirArrows=0
