@@ -131,7 +131,7 @@ function commitCode() {
 	svn status
 
 	printf "\n"
-	read -p "Commit the above files to ${YELLOW}$BRANCH${NORMAL}? (y/n) " -n 1
+	read -p "Commit the above files to ${YELLOW}$BRANCH${NORMAL}? (y/n) "
 
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
@@ -141,7 +141,7 @@ function commitCode() {
 		COMMIT_COMMENT="#$BRANCH_NO comment: $COMMENT" 
 		printf "\n$COMMIT_COMMENT\n\n"
 
-		read -p "Is this comment okay? (y/n) " -n 1
+		read -p "Is this comment okay? (y/n) "
 		if [[ $REPLY =~ ^[Yy]$ ]]
 		then 
 			printf "\n\n"
@@ -205,7 +205,7 @@ function newBranch() {
 	BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION"
 	printf "\n$BRANCH_COMMENT\n\n"
 
-	read -p "Create a new branch with this commit comment? (y/n) " -n 1
+	read -p "Create a new branch with this commit comment? (y/n) "
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then 
 		# Create the branch
@@ -215,7 +215,7 @@ function newBranch() {
 
 		#CURRENT_BRANCH=$(getBranchName)
 
-		read -p "Switch to ${CYAN}$1${NORMAL} now? (y/n) " -n 1
+		read -p "Switch to ${CYAN}$1${NORMAL} now? (y/n) "
 		if [[ $REPLY =~ ^[Yy]$ ]]
 		then 
 			printf "\n"
