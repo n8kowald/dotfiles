@@ -1,7 +1,5 @@
 ## Dotfiles
 
-I symlink my .vimrc using
+Symlinks
 ln -s ~/dotfiles/.vimrc ~/.vimrc
-
-### Vim
-* .vimrc
+ln -s ~/dotfiles/.bashrc ~/.bashrc
