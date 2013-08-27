@@ -6,7 +6,8 @@
 
 # Global variables
 EXAMPLE_BRANCH="201982_branch_name_1"
-MSG_USAGE="${YELLOW}Usage:${NORMAL}"
+MSG_USAGE="${YELLOW}Usage:"
+MSG_FAIL="${RED}[FAIL]${NORMAL}"
 
 # Source private variables
 if [ -f ~/dotfiles/bashrc_modules/think-finance-private.sh ]; then
@@ -52,7 +53,7 @@ function switchTrunk() {
 	# Check for uncommitted files
 	if getUncommittedFiles
 	then
-		printf "[${RED}Fail${NORMAL}] you have uncommitted files. You must commit these files before switching:\n\n"
+		printf "$MSG_FAIL You have uncommitted files. You must commit these files before switching:\n\n"
 		svn status
 		printf "\n"
 		return 0
@@ -68,14 +69,14 @@ function switchBranch() {
 	# Branch name is required
 	if [ $# -eq 0 ]
 	then
-		printf "[${RED}Fail${NORMAL}] branch name required.\n$MSG_USAGE sb 191043_sunny_tips_7\n"
+		printf "$MSG_FAIL Branch name required.\n$MSG_USAGE sb 191043_sunny_tips_7\n"
 		return 0
 	fi
 
 	# Check for uncommitted files
 	if getUncommittedFiles
 	then
-		printf "[${RED}Fail${NORMAL}] you have uncommitted files. You must commit these files before switching:\n\n"
+		printf "$MSG_FAIL You have uncommitted files. You must commit these files before switching:\n\n"
 		svn status
 		printf "\n"
 		return 0
@@ -97,7 +98,7 @@ function getBranchNumberFromName() {
 	# Check for branch name
 	if [ $# -eq 0 ]
 	then
-		printf "[${RED}Fail${NORMAL}] Branch name is required.\n$MSG_USAGE getBranchNumberFromName $EXAMPLE_BRANCH\n"
+		printf "$MSG_FAIL Branch name is required.\n$MSG_USAGE getBranchNumberFromName $EXAMPLE_BRANCH\n"
 		return 0
 	fi
 	BRANCH=$1
@@ -169,12 +170,12 @@ export -f commitCode
 alias nb='cd /var/www/html && newBranch'
 function newBranch() {
 
-	MSG_FORCE="${CYAN}Hint:${NORMAL} To create a branch named '$1', add the ${CYAN}--force${NORMAL} flag: 'nb $1 --force'\n"
+	MSG_FORCE="${CYAN}Hint: To create a branch named '$1', add the --force flag: 'nb $1 --force'\n"
 
 	# Check for branch name
 	if [ $# -eq 0 ]
 	then
-		printf "[${RED}Fail${NORMAL}] New branch name is required.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n"
+		printf "$MSG_FAIL New branch name is required.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n"
 		return 0
 	fi
 
@@ -188,14 +189,14 @@ function newBranch() {
 	# Check branch name starts with [0-9]_
 	if ! [[ $1 =~ [0-9]_.+ ]]
 	then
-		printf "[${RED}Fail${NORMAL}] Branch names need to start with the associated Target Process number.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n$MSG_FORCE"
+		printf "$MSG_FAIL Branch names need to start with their associated Target Process number.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n$MSG_FORCE"
 		return 0
 	fi
 
 	# Check branch name ends in _[1-9]
 	if ! [[ $1 =~ .+_[1-9]$ ]]
 	then
-		printf "[${RED}Fail${NORMAL}] Branch names need to end in a version number _1.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n$MSG_FORCE"
+		printf "$MSG_FAIL Branch names need to end in a version number _1.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n$MSG_FORCE"
 		return 0
 	fi
 
