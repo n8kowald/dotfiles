@@ -190,6 +190,8 @@ endfunction
 nnoremap <f2> :call SeekTrailingWhiteSpace()<cr>
 nnoremap <f3> :call SeekIndentWarningOccurrence()<cr>")"
 
+match ErrorMsg '\%>80v.\+'
+
 " Changes plugin
 :let g:changes_vcs_check=1
 :let g:changes_vcs_system='svn'

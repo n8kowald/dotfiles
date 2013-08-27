@@ -37,6 +37,7 @@ alias ....="cd ../../.."
 alias ls='ls -hF --color=auto'
 alias lsd="ls -l | egrep '^d'"
 alias ebrc='vim ~/.bashrc'
+alias evrc='vim ~/.vimrc'
 alias fu='sudo $(history -p !-1)'
 alias reload='source ~/.bashrc && echo "Reloaded ~/.bashrc successfully"'
 alias show_aliases="clear && grep 'alias' ~/.bashrc"

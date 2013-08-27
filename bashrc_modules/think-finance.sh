@@ -180,7 +180,7 @@ function newBranch() {
 
 	if [[ $2 && $2 = --force ]]
 	then
-		svn copy ${DIR_TRUNK_ROO} ${URL_BRANCH_ROOT}$1
+		svn copy ${URL_TRUNK_ROOT} ${URL_BRANCH_ROOT}$1
 		svn info;
 		return 0
 	fi
