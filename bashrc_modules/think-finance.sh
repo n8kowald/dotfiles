@@ -8,9 +8,9 @@
 EXAMPLE_BRANCH="201982_branch_name_1"
 MSG_USAGE="${YELLOW}Usage:"
 MSG_FAIL="${RED}[FAIL]${NORMAL}"
+CURRENT_DIR="${BASH_SOURCE%/*}"
 
 # Source private variables
-CURRENT_DIR="${BASH_SOURCE%/*}"
 if [ -f ${CURRENT_DIR}/think-finance-private.sh ]; then
 	source ${CURRENT_DIR}/think-finance-private.sh
 else
@@ -32,8 +32,9 @@ alias tests='cd /var/www/html/tests'
 alias sql='cd /var/www/html/sql'
 alias lb='svn ls ${URL_BRANCH_ROOT} --verbose'
 alias swt='cd /var/www/html && switchTrunk'
-alias restart_apache='sudo service httpd start'
+alias restart_apache='sudo service httpd stop && sudo service httpd start'
 alias restart_mysql='sudo /sbin/service mysql restart'
+alias ephpi='sudo vim /etc/php.ini'
 
 # Bash functions -- mostly SVN wrappers
 
@@ -71,7 +72,7 @@ function switchBranch() {
 	# Branch name is required
 	if [ $# -eq 0 ]
 	then
-		printf "$MSG_FAIL Branch name required.\n$MSG_USAGE sb 191043_sunny_tips_7\n"
+		printf "$MSG_FAIL Branch name required.\n$MSG_USAGE sb $EXAMPLE_BRANCH\n"
 		return 0
 	fi
 
@@ -85,14 +86,15 @@ function switchBranch() {
 	fi
 
 	svn switch ${URL_BRANCH_ROOT}$1;
-	printf "${GREEN}Successfully switched to branch: ${NORMAL}${URL_BRANCH_ROOT}$1\n"
+	printf "${GREEN}Successfully switched to branch:\n${NORMAL}${URL_BRANCH_ROOT}$1\n"
 }
 export -f switchBranch
 
 # Get the name of the current branch
 alias wb='getBranchName'
 function getBranchName() {
-	echo $(svn info | grep 'URL:' | grep -oEi '[^/]+$')
+	DIR_ROOT=$(getRootFromDir)
+	echo $(cd $DIR_ROOT && svn info | grep 'URL:' | grep -oEi '[^/]+$')
 }
 export -f getBranchName
 
@@ -121,9 +123,11 @@ export -f getBranchURL
 function getTPURL {
 	BRANCH=$(getBranchName)
 	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
+
 	echo ${URL_TP_TICKET_ROOT}${BRANCH_NO}
 }
 export -f getTPURL
+
 
 # Commit code
 alias commit='commitCode'
@@ -133,12 +137,42 @@ function commitCode() {
 	cd $DIR_ROOT
 
 	BRANCH=$(getBranchName)
-	STATUS=$(svn status)
+	STATUS=$(svn status | grep -Eo '[a-z].*')
 	# If there are no files to commit, say so and exit
 	if [[ -z  $STATUS ]]
 	then
 		printf "There's nothing to commit.\n"
 		return 0
+	fi
+
+	# Prompt about PHP Code Sniffer if that exists
+	if [[ -z $(type phpcs | grep 'not found') ]] 
+	then
+		PHP_FILES=$(echo $STATUS | tr ' ' '\n' | grep -E '*.php')
+		NO_FILES=$(echo $PHP_FILES | wc -l)
+		if [[ $NO_FILES -gt 0 ]]
+		then
+			printf "${CYAN}${PHP_FILES}${NORMAL}\n"
+			read -p "Run PHP Code Sniffer on these PHP files? (y/n) "
+				if [[ $REPLY =~ ^[Yy]$ ]]
+				then
+					# Convert newlines to spaces
+					ssv=$(echo $PHP_FILES | tr '\n' ' ')
+					for f in $ssv
+					do
+						OUTPUT=$(phpcs $f | tee /dev/tty)
+						ERRORS=$(echo $OUTPUT | grep 'ERROR')
+						if [[ $ERRORS ]]
+						then 
+							printf "$MSG_FAIL Code failed coding standards check. Fix, then recommit.\n"
+							return 0
+						fi
+					done
+					# Success
+					printf "${GREEN}Success! Code meets the coding standard.${NORMAL}\n\n"
+
+				fi
+		fi
 	fi
 
 	svn status
@@ -152,7 +186,7 @@ function commitCode() {
 		printf "\n"
 		read -p "Enter your commit comment: " COMMENT
 		COMMIT_COMMENT="#$BRANCH_NO comment: $COMMENT" 
-		printf "${CYAN}\n$COMMIT_COMMENT\n\n"
+		printf "${CYAN}\n$COMMIT_COMMENT${NORMAL}\n\n"
 
 		read -p "Commit with the following comment? (y/n) "
 		if [[ $REPLY =~ ^[Yy]$ ]]
@@ -218,19 +252,19 @@ function newBranch() {
 	BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
 	read -p "Enter a description of this branch: " DESCRIPTION
 	BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION"
-	printf "${CYAN}\n$BRANCH_COMMENT\n\n"
+	printf "${CYAN}$BRANCH_COMMENT${NORMAL}\n"
 
 	read -p "Create a new branch with this commit comment? (y/n) "
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then 
 		# Create the branch
 		svn copy ${URL_TRUNK_ROOT} ${URL_BRANCH_ROOT}$1 -m "$BRANCH_COMMENT"
-		printf "\n\n${GREEN}Branch${NORMAL} ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
+		printf "${GREEN}Branch${YELLOW} ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
 		printf "${URL_BRANCH_ROOT}$1\n\n"
 
 		#CURRENT_BRANCH=$(getBranchName)
 
-		read -p "Switch to ${CYAN}$1${NORMAL} now? (y/n) "
+		read -p "Switch to ${YELLOW}$1${NORMAL} now? (y/n) "
 		if [[ $REPLY =~ ^[Yy]$ ]]
 		then 
 			printf "\n"
