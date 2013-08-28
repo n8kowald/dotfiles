@@ -10,10 +10,11 @@ MSG_USAGE="${YELLOW}Usage:"
 MSG_FAIL="${RED}[FAIL]${NORMAL}"
 
 # Source private variables
-if [ -f ~/dotfiles/bashrc_modules/think-finance-private.sh ]; then
-	source ~/dotfiles/bashrc_modules/think-finance-private.sh
+CURRENT_DIR="${BASH_SOURCE%/*}"
+if [ -f ${CURRENT_DIR}/think-finance-private.sh ]; then
+	source ${CURRENT_DIR}/think-finance-private.sh
 else
-	printf '[${RED}Error${NORMAL}] Required Think Finance variables not found.'
+	printf '[Error] Required Think Finance variables not found.'
 	return 0
 fi
 
@@ -34,11 +35,12 @@ alias swt='cd /var/www/html && switchTrunk'
 alias restart_apache='sudo service httpd start'
 alias restart_mysql='sudo /sbin/service mysql restart'
 
-# Bash function -- mostly SVN wrappers
+# Bash functions -- mostly SVN wrappers
 
 # Get uncommitted files
 function getUncommittedFiles() {
-	UF=$(cd /var/www/html && svn status | wc -l)
+	DIR_ROOT=$(getRootFromDir)
+	UF=$(cd $DIR_ROOT && svn status | wc -l)
 	if [ $UF -gt 0 ]
 	then
 		return 0
@@ -107,18 +109,29 @@ function getBranchNumberFromName() {
 }
 export -f getBranchNumberFromName
 
+# Get Branch URL
+alias wbu=getBranchURL
+function getBranchURL() {
+	DIR_ROOT=$(getRootFromDir)
+	echo $(cd $DIR_ROOT && svn info | grep 'URL: ' | grep -oEi 'http.+')
+}
+export -f getBranchURL
+
 # Get the Target Process URL associated with the current branch
-alias wbu='getBranchURL'
-function getBranchURL {
+function getTPURL {
 	BRANCH=$(getBranchName)
 	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
 	echo ${URL_TP_TICKET_ROOT}${BRANCH_NO}
 }
-export -f getBranchURL
+export -f getTPURL
 
 # Commit code
-alias commit='cd /var/www/html && commitCode'
+alias commit='commitCode'
 function commitCode() {
+	# Switch to branch root 
+	DIR_ROOT=$(getRootFromDir)
+	cd $DIR_ROOT
+
 	BRANCH=$(getBranchName)
 	STATUS=$(svn status)
 	# If there are no files to commit, say so and exit
@@ -146,10 +159,12 @@ function commitCode() {
 		then 
 			printf "\n"
 			OUTPUT=$(svn commit -m "$COMMIT_COMMENT" | tee /dev/tty)
-			printf "\n${GREEN}Success!${NORMAL} Make sure you update the TP ticket:\n${URL_TP_TICKET_ROOT}${BRANCH_NO}\n\n"
+			TP_URL=$(getTPURL)
+			printf "\n${GREEN}Success!${NORMAL} Make sure you update the TP ticket:\n$TP_URL\n\n"
 			printf "TP ticket comment:\n"
 			# Branch URL
-			printf "Branch: $(svn info | grep 'URL: ' | grep -oEi 'http.+')\n"
+			BRANCH_URL=$(getBranchURL)
+			printf "Branch: $BRANCH_URL\n"
 			# Revision Number
 			REV_NO=$(echo $OUTPUT | grep 'Committed revision' | grep -oEi '[0-9]{5,}')
 			printf "Revision: $REV_NO\n"
@@ -231,6 +246,22 @@ function newBranch() {
 	fi
 }
 export -f newBranch
+
+# Gets the dir root for the given branch (e.g. /var/www/html)
+function getRootFromDir()
+{
+	# Default
+	ROOT='/var/www/html'			
+	
+	# If we're inside /tools
+	if [[ $(pwd | grep '/tools') ]]
+	then 
+		ROOT='/var/www/html/public/tools'
+	fi
+
+	echo $ROOT
+}
+export -f getRootFromDir
 
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
 export SVN_EDITOR=vim
