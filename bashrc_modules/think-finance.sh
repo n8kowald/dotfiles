@@ -149,8 +149,8 @@ function commitCode() {
 	if type -p phpcs > /dev/null;
 	then
 		PHP_FILES=$(echo $STATUS | tr ' ' '\n' | grep -E '*.php')
-		NO_FILES=$(echo $PHP_FILES | wc -l)
-		if [[ $NO_FILES -gt 0 ]]
+		NO_FILES=$(echo $PHP_FILES | grep -v '^\s*$' | wc -l)
+		if [[ $NO_FILES -gt 0 && $PHP_FILES ]]
 		then
 			printf "${CYAN}${PHP_FILES}${NORMAL}\n"
 			read -p "Run PHP Code Sniffer on these PHP files? (y/n) "
