@@ -203,4 +203,8 @@ match ErrorMsg '\%>80v.\+'
 " Disable syntastic
 let g:pathogen_disabled = ['syntastic']
 
+" Tell vim where the tags file lives
+:set tags=/var/www/html/tags
+
+
 call pathogen#infect()

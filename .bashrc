@@ -41,7 +41,7 @@ alias evrc='vim ~/.vimrc'
 alias etf='vim ~/dotfiles/bashrc_modules/think-finance.sh'
 alias fu='sudo $(history -p !-1)'
 alias reload='source ~/.bashrc && echo "Reloaded ~/.bashrc successfully"'
-alias show_aliases="clear && grep 'alias' ~/.bashrc"
+alias show_aliases="clear && grep -r -h 'alias' ~/dotfiles/ --exclude=.git* --exclude=HEAD* --exclude=master*"
 alias dotfiles='cd ~/dotfiles'
 
 extract () {
