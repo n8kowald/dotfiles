@@ -33,9 +33,21 @@ alias sql='cd /var/www/html/sql'
 alias lb='svn ls ${URL_BRANCH_ROOT} --verbose'
 alias mb='lb | grep nkowald'
 alias swt='cd /var/www/html && switchTrunk'
-alias restart_apache='sudo service httpd stop && sudo service httpd start'
+alias restart_apache='sudo /etc/init.d/crond stop && sudo service httpd stop && sudo service httpd start && sudo /etc/init.d/crond start'
 alias restart_mysql='sudo /sbin/service mysql restart'
 alias ephpi='sudo vim /etc/php.ini'
+alias eac='sudo vim /etc/httpd/conf/httpd.conf'
+
+# Removal shortcut aliases
+alias rm-kenshoo='sudo rm -rf ./public/Cronjobs/kenshoo/csv_reports/csv_*'
+alias rm-uploaded-docs='sudo rm -rf ./public/members/uploadeddocs/*'
+
+# Svn shotcut aliases
+alias svn-add-unstaged="svn st | grep '^?' | awk '{print $2}' | xargs svn add"
+alias svn-remove-unstaged="svn st | grep '^?' | awk '{print $2}' | xargs rm -rf"
+alias svn-revert-all="svn st | grep -e '^M' | awk '{print $2}' | xargs svn revert"
+alias svn-make-patch="svn diff > $1"
+alias svn-apply-patch="patch -p0 -i $1" 
 
 # Bash functions -- mostly SVN wrappers
 
@@ -76,6 +88,13 @@ function switchBranch() {
 		printf "$MSG_FAIL Branch name required.\n$MSG_USAGE sb $EXAMPLE_BRANCH\n"
 		return 0
 	fi
+
+    # Check branch exists
+    if [[ $(doesBranchExist $1) != 'yes' ]]
+    then
+        printf "$MSG_FAIL branch '${URL_BRANCH_ROOT}$1' doesn't exist\n"
+        return 0
+    fi
 
 	# Check for uncommitted files
 	if getUncommittedFiles
@@ -235,6 +254,13 @@ function newBranch() {
 		return 0
 	fi
 
+    # Check branch exists
+    if [[ $(doesBranchExist $1) == 'yes' ]]
+    then
+        printf "$MSG_FAIL Branch ${CYAN}$1${NORMAL} already exist!\n"
+        return 0
+    fi
+
 	if [[ $2 && $2 = --force ]]
 	then
 		svn copy ${URL_TRUNK_ROOT} ${URL_BRANCH_ROOT}$1
@@ -303,6 +329,26 @@ function getRootFromDir()
 	echo $ROOT
 }
 export -f getRootFromDir
+
+function doesBranchExist()
+{
+	# Check for branch name given
+	if [ $# -eq 0 ]
+	then
+		printf "$MSG_FAIL Branch name is required.\n$MSG_USAGE be $EXAMPLE_BRANCH\n"
+		return 0
+	fi
+
+	RESULT=$(svn ls ${URL_BRANCH_ROOT}$1)
+    error=$?
+    if [ $error -ne 0 ]; then
+        echo "no"
+    else
+        echo "yes"
+    fi
+}
+export -f doesBranchExist
+alias be='cd /var/www/html/ && doesBranchExist'
 
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
 export SVN_EDITOR=vim

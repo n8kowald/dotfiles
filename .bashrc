@@ -43,6 +43,7 @@ alias fu='sudo $(history -p !-1)'
 alias reload='source ~/.bashrc && echo "Reloaded ~/.bashrc successfully"'
 alias show_aliases="clear && grep -r -h 'alias' ~/dotfiles/ --exclude=.git* --exclude=HEAD* --exclude=master*"
 alias dotfiles='cd ~/dotfiles'
+alias gh="open `git remote -v | grep fetch | awk '{print $2}' | sed 's/git@/http:\/\//' | sed 's/com:/com\//'`| head -n1"
 
 extract () {
   if [ -f $1 ] ; then
@@ -76,6 +77,7 @@ function gci() {
 export -f gci
 
 export LANG=en_US.UTF-8
+export LC_ALL=C
 
 # save all the histories
 export HISTFILESIZE=1000000

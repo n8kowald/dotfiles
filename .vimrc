@@ -5,7 +5,8 @@ set softtabstop=4	" num of spaces a tab counts for when <Tab> or <BS>
 set shiftwidth=4	" spaces to use for (auto)indent
 set autoindent		" copy indent from current line
 set smartindent		" happy auto indenting
-set noexpandtab		" use tabs
+"set noexpandtab	" use tabs
+set expandtab		" use spaces :*(
 
 set ignorecase		" case-insensitive searching
 set splitright		" place new split in the right hand side
@@ -201,10 +202,12 @@ match ErrorMsg '\%>80v.\+'
 :let g:NERDTreeDirArrows=0
 
 " Disable syntastic
-let g:pathogen_disabled = ['syntastic']
+"let g:pathogen_disabled = ['syntastic']
+let g:syntastic_enable_signs=1
+let g:syntastic_check_on_open=1
 
 " Tell vim where the tags file lives
-:set tags=/var/www/html/tags
+:set tags=/var/www/tags
 
 
 call pathogen#infect()
