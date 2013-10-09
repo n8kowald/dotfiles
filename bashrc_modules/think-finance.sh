@@ -257,7 +257,7 @@ function newBranch() {
     # Check branch exists
     if [[ $(doesBranchExist $1) == 'yes' ]]
     then
-        printf "$MSG_FAIL Branch ${CYAN}$1${NORMAL} already exist!\n"
+        printf "$MSG_FAIL Branch ${YELLOW}$1${NORMAL} already exist!\n"
         return 0
     fi
 
@@ -356,4 +356,7 @@ export SVN_EDITOR=vim
 # source custom bash autocompletions
 if [ -f /etc/bash_completion.d/sb ]; then
 	. /etc/bash_completion.d/sb
+fi
+if [ -f /etc/bash_completion.d/nb ]; then
+	. /etc/bash_completion.d/nb
 fi
