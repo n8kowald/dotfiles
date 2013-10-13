@@ -84,7 +84,6 @@ function tmh {
 }
 
 export LANG=en_US.UTF-8
-export LC_ALL=C
 
 # save all the histories
 export HISTFILESIZE=1000000
@@ -98,7 +97,7 @@ shopt -s histappend
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
-shopt -s checkwinsize
+#shopt -s checkwinsize
 
 # enable colors
 eval "`dircolors -b`"
