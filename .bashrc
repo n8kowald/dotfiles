@@ -76,7 +76,7 @@ function gci() {
 }
 export -f gci
 
-function tmhelp {
+function tmh {
     printf "${YELLOW}New session:${NORMAL} tmux new -s session-name\n"
     printf "${YELLOW}Reopen session:${NORMAL} tmux attach -t session-name\n"
     printf "${YELLOW}Show sessions:${NORMAL} tmux ls\n"
