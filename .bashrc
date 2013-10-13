@@ -78,7 +78,7 @@ export -f gci
 
 function tmhelp {
     printf "${YELLOW}New session:${NORMAL} tmux new -s session-name\n"
-    printf "${YELLOW}Reopen session:${NORMAL} tmux switch -t session-name\n"
+    printf "${YELLOW}Reopen session:${NORMAL} tmux attach -t session-name\n"
     printf "${YELLOW}Show sessions:${NORMAL} tmux ls\n"
     printf "${YELLOW}Kill session:${NORMAL} tmux kill-session -t tmux-config\n"
 }
