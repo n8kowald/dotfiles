@@ -1,4 +1,4 @@
-"set nocompatible   " stops vim from behaving in a vi compatible way
+" set nocompatible   " stops vim from behaving in a vi compatible way
 
 set tabstop=4		" how wide the tab is
 set softtabstop=4	" num of spaces a tab counts for when <Tab> or <BS>
@@ -16,9 +16,9 @@ filetype plugin indent on			" filetype detection
 syntax on		" syntax highlighting on
 
 " set the 't_Co' option in vim to 256 to override the terminfo value
-if &term == "xterm"
+"if &term == "xterm"
 	set t_Co=256
-endif
+"endif
 
 colorscheme jellybeans
 
@@ -68,7 +68,7 @@ endfunction
 
 function! TabSpacesON()
 	set list
-		set listchars=tab:>·,trail:·,nbsp:·
+		set listchars=tab:>Â·,trail:Â·,nbsp:Â·
 		endfunction
 
 function! TabSpacesOFF()
