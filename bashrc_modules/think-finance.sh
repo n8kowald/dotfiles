@@ -48,6 +48,7 @@ alias svn-revert-all="svn st | grep -e '^M' | awk '{print $2}' | xargs svn rever
 alias svn-make-patch="svn diff > $1"
 alias svn-apply-patch="patch -p0 -i $1" 
 
+export LC_ALL=C
 # Bash functions -- mostly SVN wrappers
 
 # Get uncommitted files
@@ -253,7 +254,7 @@ function commitCode() {
 			BRANCH_URL=$(getBranchURL)
 			printf "Branch: $BRANCH_URL\n"
 			# Revision Number
-			REV_NO=$(echo $OUTPUT | grep 'Committed revision' | grep -oEi '[0-9]{5,}')
+			REV_NO=$(echo $OUTPUT | grep 'Committed revision' | grep -oEi '[0-9]{5,}' | sed -n '$p')
 			printf "Revision: $REV_NO\n"
 			# Revision URL
 			printf "Changeset: ${URL_CHANGESET_ROOT}${REV_NO}\n\n"
@@ -478,7 +479,6 @@ function getCommitInfoFromBranch()
     echo $(svn log --stop-on-copy "${URL_BRANCH_ROOT}${BRANCH}" | grep -Po '^r[^ ]+')
 }
 export -f getCommitInfoFromBranch
-alias gci='getCommitInfoFromBranch'
 
 function viewHistory()
 {
@@ -504,7 +504,7 @@ function rebaseline()
     then
         # Create new branch
         #printf "Creating ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL}...\n"
-        BRANCH_COMMENT="#${BRANCH_NO} comment: Rebaseline ${THIS_BRANCH}"
+        BRANCH_COMMENT="#${BRANCH_NO} comment: Rebaseline ${THIS_BRANCH} with trunk."
         svn copy ${URL_TRUNK_ROOT} ${URL_BRANCH_ROOT}${NEXT_BRANCH_NAME} -m "$BRANCH_COMMENT"
         #printf "Created ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL} with branch comment: '${BRANCH_COMMENT}'\n\n"
 
