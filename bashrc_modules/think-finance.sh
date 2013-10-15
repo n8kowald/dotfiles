@@ -37,6 +37,11 @@ alias restart_mysql='sudo /sbin/service mysql restart'
 alias ephpi='sudo vim /etc/php.ini'
 alias eac='sudo vim /etc/httpd/conf/httpd.conf'
 
+# tmux aliases
+# Attach to the 1st available session and show a selector for the rest
+alias ts="tmux attach-session -t `tmux list-sessions -F '#{session_name}' | tail -n 1` \; choose-session"
+alias tls="tmux list-sessions"
+
 # Removal shortcut aliases
 alias rm-kenshoo='sudo rm -rf ./public/Cronjobs/kenshoo/csv_reports/csv_*'
 alias rm-uploaded-docs='sudo rm -rf ./public/members/uploadeddocs/*'
@@ -381,7 +386,13 @@ alias be='sites && doesBranchExist'
 
 function getVersionNumber()
 {
-    echo $(getBranchName | grep -o '[0-9]*$')
+    VERSION_NUM=$(getBranchName | grep -o '[0-9]*$')
+    if [[ -z $VERSION_NUM ]]
+    then
+        echo 1
+    else
+        echo $VERSION_NUM
+    fi
 }
 export -f getVersionNumber
 
@@ -488,15 +499,29 @@ function viewHistory()
 export -f viewHistory
 alias vh='viewHistory'
 
+function getNextBranchName()
+{
+    NEXT_VERSION_NUM=$(getNextVersionNumber)
+    BRANCH_NAME=$(getBranchName)
+    BRANCH_WITH_VERSION_NUM=$(echo $BRANCH_NAME | grep -o '.*_[0-9]$')
+    if [[ -z $BRANCH_WITH_VERSION_NUM ]]
+    then
+        NEXT_BRANCH_NAME=$(getBranchName)_${NEXT_VERSION_NUM}    
+    else
+        NEXT_BRANCH_NAME=$(getBranchName | grep -o '.*_')${NEXT_VERSION_NUM}
+    fi
+    echo $NEXT_BRANCH_NAME
+}
+export -f getNextBranchName
+
 function rebaseline()
 {
     THIS_BRANCH=$(getBranchName)
-    NEXT_VERSION_NUM=$(getNextVersionNumber)
-    NEXT_BRANCH_NAME=$(getBranchName | grep -o '.*_')${NEXT_VERSION_NUM}
     BRANCH_NO=$(getBranchNumberFromName ${THIS_BRANCH})
 
     # Show nice summary of changes
     printf "${GREEN}Commit log:${NORMAL} ${THIS_BRANCH}\n"
+    echo ${URL_BRANCH_ROOT}${THIS_BRANCH}
     svn log -v --stop-on-copy ${URL_BRANCH_ROOT}${THIS_BRANCH}
     printf "\n"
     read -p "Create ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL} and merge ${GREEN}all commits${NORMAL} from '${CYAN}${THIS_BRANCH}${NORMAL}'? (y/n) "
