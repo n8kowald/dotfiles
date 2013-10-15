@@ -518,6 +518,7 @@ function rebaseline()
 {
     THIS_BRANCH=$(getBranchName)
     BRANCH_NO=$(getBranchNumberFromName ${THIS_BRANCH})
+    NEXT_BRANCH_NAME=$(getNextBranchName)
 
     # Show nice summary of changes
     printf "${GREEN}Commit log:${NORMAL} ${THIS_BRANCH}\n"
