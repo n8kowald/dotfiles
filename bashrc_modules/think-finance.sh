@@ -299,8 +299,6 @@ alias dre='doesRevisionExist'
 # Create new SVN branch based on Trunk
 function newBranch() {
 
-	MSG_FORCE="${CYAN}Hint:${NORMAL} To create a branch named '$1', add the --force flag: 'nb $1 --force'\n"
-
 	# Check for branch name
 	if [ $# -eq 0 ]
 	then
@@ -318,14 +316,14 @@ function newBranch() {
 	# Check branch name starts with [0-9]_
 	if ! [[ $1 =~ [0-9]_.+ ]]
 	then
-		printf "$MSG_FAIL Branch names need to start with their associated Target Process number.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n$MSG_FORCE"
+		printf "$MSG_FAIL Branch names need to start with their associated Target Process number.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n"
 		return 0
 	fi
 
 	# Check branch name ends in _[1-9]
 	if ! [[ $1 =~ .+_[1-9]$ ]]
 	then
-		printf "$MSG_FAIL Branch names need to end in a version number _1.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n$MSG_FORCE"
+		printf "$MSG_FAIL Branch names need to end in a version number _1.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n"
 		return 0
 	fi
 
@@ -333,7 +331,7 @@ function newBranch() {
     COPY_ROOT=${URL_DEVELOP_ROOT}
     COPY_ROOT_NAME="${GREEN}DEVELOP${NORMAL}"
 
-    printf "\n"
+    #printf "\n"
     read -p "Choose branch base (1) Develop, (2) Trunk: "
     if [[ $REPLY =~ ^[1]$ ]]
     then
@@ -361,18 +359,26 @@ function newBranch() {
         printf "${COPY_ROOT_NAME} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
     fi
 
-	if [[ $2 && $2 = --force ]]
-	then
-		svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1
-		svn info;
-		return 0
-	fi
+    # Refactor so argument order doesn't matter
+	#if [[ $2 && $2 = --force ]]
+	#then
+		#svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1
+		#svn info;
+		#return 0
+	#fi
+	#MSG_FORCE="${CYAN}Hint:${NORMAL} To create a branch named '$1', add the --force flag: 'nb $1 --force'\n"
 
+    # Check comment is passed in the second parameter
+    if [[ -z "$2" ]]
+    then 
+        BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
+        read -p "Enter a description of this branch: " DESCRIPTION
+        BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION"
+    else
+        BRANCH_COMMENT=$2
+    fi
 
-	BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
-	read -p "Enter a description of this branch: " DESCRIPTION
-	BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION"
-	printf "${CYAN}$BRANCH_COMMENT${NORMAL}\n"
+    printf "${CYAN}$BRANCH_COMMENT${NORMAL}\n"
 
 	read -p "Create a new branch from ${COPY_ROOT_NAME} with this commit comment? (y/n) "
 	if [[ $REPLY =~ ^[Yy]$ ]]
@@ -381,8 +387,6 @@ function newBranch() {
 		svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1 -m "$BRANCH_COMMENT"
 		printf "${GREEN}Branch ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
 		printf "${URL_BRANCH_ROOT}$1\n\n"
-
-		#CURRENT_BRANCH=$(getBranchName)
 
 		read -p "Switch to ${YELLOW}$1${NORMAL} now? (y/n) "
 		if [[ $REPLY =~ ^[Yy]$ ]]
