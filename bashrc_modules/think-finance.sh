@@ -6,7 +6,7 @@
 
 # Global variables
 EXAMPLE_BRANCH="201982_branch_name_1"
-MSG_USAGE="${YELLOW}Usage:"
+MSG_USAGE="${YELLOW}Usage:${NORMAL}"
 MSG_FAIL="${RED}[FAIL]${NORMAL}"
 CURRENT_DIR="${BASH_SOURCE%/*}"
 
@@ -22,6 +22,8 @@ fi
 alias sites='cd /var/www/html/'
 alias views='cd /var/www/html/application/views/scripts'
 alias controllers='cd /var/www/html/application/controllers'
+alias services='cd /var/www/html/application/services'
+alias models='cd /var/www/html/application/models/DbTable'
 alias styles='cd /var/www/html/public/mobile/css'
 alias images='cd /var/www/html/public/mobile/images'
 alias scripts='cd /var/www/html/public/mobile/scripts'
@@ -275,10 +277,29 @@ function commitCode() {
 export -f commitCode
 alias commit='commitCode'
 
+function doesRevisionExist()
+{
+	# Check for revision URL
+	if [ $# -eq 0 ]
+	then
+		printf "$MSG_FAIL Revision URL is required.\n$MSG_USAGE dre $URL_BRANCH_ROOT@12345\n"
+		return 0
+	fi
+
+    # Send stdout and stderr to /dev/null
+    if svn info $1 &> /dev/null; then
+        echo "yes"
+    else
+        echo "no"
+    fi
+}
+export -f doesRevisionExist
+alias dre='doesRevisionExist'
+
 # Create new SVN branch based on Trunk
 function newBranch() {
 
-	MSG_FORCE="${CYAN}Hint: To create a branch named '$1', add the --force flag: 'nb $1 --force'\n"
+	MSG_FORCE="${CYAN}Hint:${NORMAL} To create a branch named '$1', add the --force flag: 'nb $1 --force'\n"
 
 	# Check for branch name
 	if [ $# -eq 0 ]
@@ -290,16 +311,9 @@ function newBranch() {
     # Check branch exists
     if [[ $(doesBranchExist $1) == 'yes' ]]
     then
-        printf "$MSG_FAIL Branch ${YELLOW}$1${NORMAL} already exist!\n"
+        printf "$MSG_FAIL Branch ${YELLOW}$1${NORMAL} already exists!\n"
         return 0
     fi
-
-	if [[ $2 && $2 = --force ]]
-	then
-		svn copy ${URL_TRUNK_ROOT} ${URL_BRANCH_ROOT}$1
-		svn info;
-		return 0
-	fi
 
 	# Check branch name starts with [0-9]_
 	if ! [[ $1 =~ [0-9]_.+ ]]
@@ -315,17 +329,57 @@ function newBranch() {
 		return 0
 	fi
 
+    # Develop is most common
+    COPY_ROOT=${URL_DEVELOP_ROOT}
+    COPY_ROOT_NAME="${GREEN}DEVELOP${NORMAL}"
+
+    printf "\n"
+    read -p "Choose branch base (1) Develop, (2) Trunk: "
+    if [[ $REPLY =~ ^[1]$ ]]
+    then
+        read -p "Enter revision number of Develop to branch from, OR (0) for HEAD: " REVISION
+        if [[ $REVISION -eq 0 ]]
+        then
+            COPY_ROOT=${URL_DEVELOP_ROOT}
+            COPY_ROOT_NAME="${GREEN}DEVELOP${NORMAL}"
+            printf "${COPY_ROOT_NAME} chosen (${YELLOW}${URL_DEVELOP_ROOT}${NORMAL})\n"
+        else
+            # Validate revision number
+            COPY_ROOT=${URL_DEVELOP_ROOT}@${REVISION}
+            if [[ $(doesRevisionExist ${COPY_ROOT}) != 'yes' ]]
+            then
+                printf "$MSG_FAIL Revision '${YELLOW}${COPY_ROOT}${NORMAL}' doesn't exist\n"
+                return 0
+            fi
+            COPY_ROOT_NAME="${GREEN}DEVELOP @ r${REVISION}${NORMAL}"
+            printf "${COPY_ROOT_NAME} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
+        fi
+    elif [[ $REPLY =~ ^[2]$ ]]
+    then
+        COPY_ROOT=${URL_TRUNK_ROOT}
+        COPY_ROOT_NAME="${GREEN}TRUNK${NORMAL}"
+        printf "${COPY_ROOT_NAME} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
+    fi
+
+	if [[ $2 && $2 = --force ]]
+	then
+		svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1
+		svn info;
+		return 0
+	fi
+
+
 	BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
 	read -p "Enter a description of this branch: " DESCRIPTION
 	BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION"
 	printf "${CYAN}$BRANCH_COMMENT${NORMAL}\n"
 
-	read -p "Create a new branch with this commit comment? (y/n) "
+	read -p "Create a new branch from ${COPY_ROOT_NAME} with this commit comment? (y/n) "
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then 
 		# Create the branch
-		svn copy ${URL_TRUNK_ROOT} ${URL_BRANCH_ROOT}$1 -m "$BRANCH_COMMENT"
-		printf "${GREEN}Branch${YELLOW} ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
+		svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1 -m "$BRANCH_COMMENT"
+		printf "${GREEN}Branch ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
 		printf "${URL_BRANCH_ROOT}$1\n\n"
 
 		#CURRENT_BRANCH=$(getBranchName)
@@ -373,12 +427,11 @@ function doesBranchExist()
 		return 0
 	fi
 
-	RESULT=$(svn ls ${URL_BRANCH_ROOT}$1)
-    error=$?
-    if [ $error -ne 0 ]; then
-        echo "no"
-    else
+    # Send stdout and stderr to /dev/null
+    if svn ls ${URL_BRANCH_ROOT}$1 &> /dev/null; then
         echo "yes"
+    else
+        echo "no"
     fi
 }
 export -f doesBranchExist
@@ -525,7 +578,7 @@ function rebaseline()
     echo ${URL_BRANCH_ROOT}${THIS_BRANCH}
     svn log -v --stop-on-copy ${URL_BRANCH_ROOT}${THIS_BRANCH}
     printf "\n"
-    read -p "Create ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL} and merge ${GREEN}all commits${NORMAL} from '${CYAN}${THIS_BRANCH}${NORMAL}'? (y/n) "
+    read -p "Create ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL} from ${CYAN}trunk${NORMAL} and merge ${GREEN}all commits${NORMAL} from '${CYAN}${THIS_BRANCH}${NORMAL}'? (y/n) "
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
         # Create new branch
