@@ -34,7 +34,8 @@ done
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
-alias ls='ls -hF --color=auto'
+#alias ls='ls -hF --color=auto'
+alias ls='ls -FGH'
 alias lsd="ls -l | egrep '^d'"
 alias ebrc='vim ~/.bashrc'
 alias evrc='vim ~/.vimrc'
@@ -100,7 +101,10 @@ shopt -s histappend
 #shopt -s checkwinsize
 
 # enable colors
-eval "`dircolors -b`"
- 
+#eval "`dircolors -b`"
+  
+# make the dir command work kinda like in windows (long format)
+alias dir='ls --color=auto --format=long'
+   
 # make grep highlight results using color
 export GREP_OPTIONS='--color=auto'
