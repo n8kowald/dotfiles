@@ -5,7 +5,7 @@
 #----------------------------------
 
 # Global variables
-EXAMPLE_BRANCH="201982_branch_name_1"
+EXAMPLE_BRANCH="123456_branch_name_1"
 MSG_USAGE="${YELLOW}Usage:${NORMAL}"
 MSG_FAIL="${RED}[FAIL]${NORMAL}"
 CURRENT_DIR="${BASH_SOURCE%/*}"
@@ -39,16 +39,15 @@ alias restart_mysql='sudo /sbin/service mysql restart'
 alias ephpi='sudo vim /etc/php.ini'
 alias eac='sudo vim /etc/httpd/conf/httpd.conf'
 
-# tmux aliases
-# Attach to the 1st available session and show a selector for the rest
-alias ts="tmux attach-session -t `tmux list-sessions -F '#{session_name}' | tail -n 1` \; choose-session"
-alias tls="tmux list-sessions"
+# Tmux
+# Because I'm dumb
+alias tmuch='tmux'
 
 # Removal shortcut aliases
 alias rm-kenshoo='sudo rm -rf ./public/Cronjobs/kenshoo/csv_reports/csv_*'
 alias rm-uploaded-docs='sudo rm -rf ./public/members/uploadeddocs/*'
 
-# Svn shotcut aliases
+# SVN shotcut aliases
 alias svn-add-unstaged="svn st | grep '^?' | awk '{print $2}' | xargs svn add"
 alias svn-remove-unstaged="svn st | grep '^?' | awk '{print $2}' | xargs rm -rf"
 alias svn-revert-all="svn st | grep -e '^M' | awk '{print $2}' | xargs svn revert"
@@ -56,12 +55,13 @@ alias svn-make-patch="svn diff > $1"
 alias svn-apply-patch="patch -p0 -i $1" 
 
 export LC_ALL=C
+
 # Bash functions -- mostly SVN wrappers
 
 # Get uncommitted files
-function getUncommittedFiles() {
-	DIR_ROOT=$(getRootFromDir)
-	UF=$(cd $DIR_ROOT && svn status | wc -l)
+function hasUncommittedFiles() {
+	local DIR_ROOT=$(getRootFromDir)
+	local UF=$(cd $DIR_ROOT && svn status | wc -l)
 	if [ $UF -gt 0 ]
 	then
 		return 0
@@ -69,12 +69,12 @@ function getUncommittedFiles() {
 		return 1
 	fi
 }
-export -f getUncommittedFiles
+export -f hasUncommittedFiles
 
 # Switch to trunk
 function switchTrunk() {
 	# Check for uncommitted files
-	if getUncommittedFiles
+	if hasUncommittedFiles
 	then
 		printf "$MSG_FAIL You have uncommitted files. You must commit these files before switching:\n\n"
 		svn status
@@ -90,7 +90,7 @@ alias swt='sites && switchTrunk'
 # Switch to develop
 function switchDevelop() {
 	# Check for uncommitted files
-	if getUncommittedFiles
+	if hasUncommittedFiles
 	then
 		printf "$MSG_FAIL You have uncommitted files. You must commit these files before switching:\n\n"
 		svn status
@@ -121,7 +121,7 @@ function switchBranch() {
     fi
 
 	# Check for uncommitted files
-	if getUncommittedFiles
+	if hasUncommittedFiles
 	then
 		printf "$MSG_FAIL You have uncommitted files. You must commit these files before switching:\n\n"
 		svn status
@@ -321,7 +321,7 @@ function newBranch() {
 	fi
 
 	# Check branch name ends in _[1-9]
-	if ! [[ $1 =~ .+_[1-9]$ ]]
+	if ! [[ $1 =~ .+_[0-9]{1,2}$ ]]
 	then
 		printf "$MSG_FAIL Branch names need to end in a version number _1.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n"
 		return 0
@@ -329,7 +329,7 @@ function newBranch() {
 
     # Develop is most common
     COPY_ROOT=${URL_DEVELOP_ROOT}
-    COPY_ROOT_NAME="${GREEN}DEVELOP${NORMAL}"
+    COPY_ROOT_NAME="DEVELOP (HEAD)"
 
     #printf "\n"
     read -p "Choose branch base (1) Develop, (2) Trunk: "
@@ -339,8 +339,8 @@ function newBranch() {
         if [[ $REVISION -eq 0 ]]
         then
             COPY_ROOT=${URL_DEVELOP_ROOT}
-            COPY_ROOT_NAME="${GREEN}DEVELOP${NORMAL}"
-            printf "${COPY_ROOT_NAME} chosen (${YELLOW}${URL_DEVELOP_ROOT}${NORMAL})\n"
+            COPY_ROOT_NAME="DEVELOP (HEAD)"
+            printf "${GREEN}${COPY_ROOT_NAME}${NORMAL} chosen (${YELLOW}${URL_DEVELOP_ROOT}${NORMAL})\n"
         else
             # Validate revision number
             COPY_ROOT=${URL_DEVELOP_ROOT}@${REVISION}
@@ -349,14 +349,14 @@ function newBranch() {
                 printf "$MSG_FAIL Revision '${YELLOW}${COPY_ROOT}${NORMAL}' doesn't exist\n"
                 return 0
             fi
-            COPY_ROOT_NAME="${GREEN}DEVELOP @ r${REVISION}${NORMAL}"
-            printf "${COPY_ROOT_NAME} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
+            COPY_ROOT_NAME="DEVELOP @ r${REVISION}"
+            printf "${GREEN}${COPY_ROOT_NAME}${NORMAL} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
         fi
     elif [[ $REPLY =~ ^[2]$ ]]
     then
         COPY_ROOT=${URL_TRUNK_ROOT}
-        COPY_ROOT_NAME="${GREEN}TRUNK${NORMAL}"
-        printf "${COPY_ROOT_NAME} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
+        COPY_ROOT_NAME="TRUNK"
+        printf "${GREEN}${COPY_ROOT_NAME}${NORMAL} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
     fi
 
     # Refactor so argument order doesn't matter
@@ -375,33 +375,40 @@ function newBranch() {
         read -p "Enter a description of this branch: " DESCRIPTION
         BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION"
     else
-        BRANCH_COMMENT=$2
+        BRANCH_COMMENT=${2/ROOT_BRANCH/$COPY_ROOT_NAME}
     fi
 
     printf "${CYAN}$BRANCH_COMMENT${NORMAL}\n"
 
-	read -p "Create a new branch from ${COPY_ROOT_NAME} with this commit comment? (y/n) "
-	if [[ $REPLY =~ ^[Yy]$ ]]
-	then 
-		# Create the branch
-		svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1 -m "$BRANCH_COMMENT"
-		printf "${GREEN}Branch ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
-		printf "${URL_BRANCH_ROOT}$1\n\n"
+    read -p "Create a new branch from ${GREEN}${COPY_ROOT_NAME}${NORMAL} with this commit comment? (y/n) "
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then 
+        # Create the branch
+        svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1 -m "$BRANCH_COMMENT"
+        printf "${GREEN}Branch ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
+        printf "${URL_BRANCH_ROOT}$1\n\n"
 
-		read -p "Switch to ${YELLOW}$1${NORMAL} now? (y/n) "
-		if [[ $REPLY =~ ^[Yy]$ ]]
-		then 
-			printf "\n"
-			switchBranch $1
-			return 0
-		else 
-			printf "\n"
-			return 0
-		fi
-	else 
-		printf "\n"
-		return 0
-	fi
+        # Change - if comment is passed, it's probably a 'rebaseline': skip the switch ask
+        if [[ -z "$2" ]]
+        then
+            read -p "Switch to ${YELLOW}$1${NORMAL} now? (y/n) "
+            if [[ $REPLY =~ ^[Yy]$ ]]
+            then 
+                printf "\n"
+                switchBranch $1
+                return 0
+            else 
+                printf "\n"
+                return 0
+            fi
+        else
+            printf "\n"
+            return 0
+        fi
+    else 
+        printf "\n"
+        return 0
+    fi
 }
 export -f newBranch
 alias nb='sites && newBranch'
@@ -582,14 +589,12 @@ function rebaseline()
     echo ${URL_BRANCH_ROOT}${THIS_BRANCH}
     svn log -v --stop-on-copy ${URL_BRANCH_ROOT}${THIS_BRANCH}
     printf "\n"
-    read -p "Create ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL} from ${CYAN}trunk${NORMAL} and merge ${GREEN}all commits${NORMAL} from '${CYAN}${THIS_BRANCH}${NORMAL}'? (y/n) "
+    read -p "Create ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL} and merge ${GREEN}all commits${NORMAL} from '${CYAN}${THIS_BRANCH}${NORMAL}'? (y/n) "
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
         # Create new branch
-        #printf "Creating ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL}...\n"
-        BRANCH_COMMENT="#${BRANCH_NO} comment: Rebaseline ${THIS_BRANCH} with trunk."
-        svn copy ${URL_TRUNK_ROOT} ${URL_BRANCH_ROOT}${NEXT_BRANCH_NAME} -m "$BRANCH_COMMENT"
-        #printf "Created ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL} with branch comment: '${BRANCH_COMMENT}'\n\n"
+        BRANCH_COMMENT="#${BRANCH_NO} comment: Rebaseline ${THIS_BRANCH} with ROOT_BRANCH."
+        nb ${NEXT_BRANCH_NAME} "$BRANCH_COMMENT"
 
         # Switch to new branch
         printf "Switching to ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL}...\n"
@@ -599,6 +604,7 @@ function rebaseline()
         REVISIONS_TO_MERGE=$(getRevisionCMD $THIS_BRANCH)
 
         printf "\n${GREEN}Test merge:${NORMAL}\n"
+        printf "${BOLD}U${NORMAL}:Updated, ${BOLD}G${NORMAL}:Changes merged, ${BOLD}M${NORMAL}:Modified, ${BOLD}I${NORMAL}:Ignored, ${BOLD}A${NORMAL}:Added, ${BOLD}D${NORMAL}:Deleted\n\n"
         printf "${MAGENTA}Running:${NORMAL} svn merge --dry-run -r $REVISIONS_TO_MERGE ${URL_BRANCH_ROOT}${THIS_BRANCH}\n"
 
         svn merge --dry-run -r $REVISIONS_TO_MERGE ${URL_BRANCH_ROOT}${THIS_BRANCH}
@@ -608,7 +614,7 @@ function rebaseline()
         read -p "Merge and commit? (y/n) "
         if [[ $REPLY =~ ^[Yy]$ ]]
         then
-            printf "\n${GREEN}Merge:${NORMAL}\n"
+            printf "\n${GREEN}Merging:${NORMAL}\n"
             # Merge it so!
             svn merge -r $REVISIONS_TO_MERGE ${URL_BRANCH_ROOT}${THIS_BRANCH}
 
@@ -627,6 +633,7 @@ function rebaseline()
     fi
 }
 
+# Thanks to Adam Atkins for this great function
 function findBranch() 
 {
     if [ $# -ge 1 ]
@@ -655,6 +662,18 @@ function findBranch()
 }
 export -f findBranch
 alias fb='findBranch'
+
+# tmux aliases
+# Create or attach to a sessions named with the current branch.
+# Thanks to Ben Johnson for this!
+function tmuxSessionFromBranch()
+{
+    BRANCH=$(getBranchName)
+    tmux attach -t $BRANCH || tmux new -s $BRANCH
+}
+export -f tmuxSessionFromBranch
+alias tm='tmuxSessionFromBranch'
+
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
 export SVN_EDITOR=vim
 
