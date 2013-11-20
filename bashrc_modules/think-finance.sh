@@ -233,7 +233,7 @@ function commitCode() {
 	svn status
 
 	printf "\n"
-	read -p "Commit theses files to ${YELLOW}$BRANCH${NORMAL}? (y/n) "
+	read -p "Has your code been reviewed? Commit these changes to ${YELLOW}$BRANCH${NORMAL}? (y/n) "
 
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
@@ -241,7 +241,7 @@ function commitCode() {
 		printf "\n"
 	    if [ $# -eq 0 ]
         then 
-		    read -p "Enter your commit comment: " COMMENT
+            read -p "Enter your commit comment (if defect: add ticket no.): " COMMENT
 		    COMMIT_COMMENT="#$BRANCH_NO comment: $COMMENT" 
         else
             COMMIT_COMMENT=$1
