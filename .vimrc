@@ -1,8 +1,8 @@
-" set nocompatible   " stops vim from behaving in a vi compatible way
+set nocompatible   " stops vim from behaving in a vi compatible way
 
 set tabstop=4		" how wide the tab is
 set softtabstop=4	" num of spaces a tab counts for when <Tab> or <BS>
-set shiftwidth=4	" spaces to use for (auto)indent
+set shiftwidth=4	" spaces to use for autoindent
 set autoindent		" copy indent from current line
 set smartindent		" happy auto indenting
 "set noexpandtab	" use tabs
