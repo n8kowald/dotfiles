@@ -76,6 +76,9 @@ function gci() {
 }
 export -f gci
 
+# tmux aliases
+alias tls="tmux list-sessions"
+
 function tmh {
     printf "${YELLOW}New session:${NORMAL} tmux new -s session-name\n"
     printf "${YELLOW}Reopen session:${NORMAL} tmux attach -t session-name\n"
