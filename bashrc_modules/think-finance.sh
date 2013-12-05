@@ -26,7 +26,7 @@ alias services='cd /var/www/html/application/services'
 alias models='cd /var/www/html/application/models/DbTable'
 alias styles='cd /var/www/html/public/mobile/css'
 alias images='cd /var/www/html/public/mobile/images'
-alias scripts='cd /var/www/html/public/mobile/scripts'
+alias js='cd /var/www/html/public/mobile/scripts'
 alias comms='cd /var/www/html/public/common/lib/customer_comms'
 alias tools='cd /var/www/html/public/tools'
 alias layouts='cd /var/www/html/application/layouts/scripts'
@@ -233,16 +233,53 @@ function commitCode() {
 	svn status
 
 	printf "\n"
-	read -p "Has your code been reviewed? Commit these changes to ${YELLOW}$BRANCH${NORMAL}? (y/n) "
+	read -p "Commit these changes to ${YELLOW}$BRANCH${NORMAL}? (y/n) "
 
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
+        
+        DEVELOPER_NAME=""
+        REVIEWBOARD_ID=""
+
+        read -p "Has this commit been peer reviewed? (y/n) "
+        if [[ $REPLY =~ ^[Yy]$ ]]
+        then
+            # Ask for reviewer name
+            NUM=1
+            for dev in ${!TF_DEVS[@]}; do
+                echo "($NUM) ${CYAN}${TF_DEVS[dev]}${NORMAL}"
+                ((NUM++))
+            done
+
+            printf "\nChoose the developer who reviewed this commit, or (0) to quit: ";
+
+            read chosen_dev
+            if [ $chosen_dev -eq 0 ]
+            then
+                return 0
+            else
+                DEVELOPER_NAME="${TF_DEVS[chosen_dev]}"
+                printf "${YELLOW}${DEVELOPER_NAME}${NORMAL} chosen.\n"
+            fi
+
+            # Enter review board id
+            read -p "Enter the Review Board ID: " RBID
+            REVIEWBOARD_ID=$RBID
+            #printf "${YELLOW}${REVIEWBOARD_ID}${NORMAL} entered.\n"
+        fi
+
 		BRANCH_NO=$(getBranchNumberFromName $BRANCH)
 		printf "\n"
 	    if [ $# -eq 0 ]
         then 
             read -p "Enter your commit comment (if defect: add ticket no.): " COMMENT
+
 		    COMMIT_COMMENT="#$BRANCH_NO comment: $COMMENT" 
+            # If Developer name and reviewboard id is not blank add it to the commit message
+            if [ ! -z "$DEVELOPER_NAME" ] && [ ! -z "$REVIEWBOARD_ID" ]
+            then
+                COMMIT_COMMENT="$COMMIT_COMMENT. Reviewed by $DEVELOPER_NAME (RBID: $REVIEWBOARD_ID)."
+            fi
         else
             COMMIT_COMMENT=$1
         fi
@@ -264,7 +301,8 @@ function commitCode() {
 			REV_NO=$(echo $OUTPUT | grep 'Committed revision' | grep -oEi '[0-9]{5,}' | sed -n '$p')
 			printf "Revision: $REV_NO\n"
 			# Revision URL
-			printf "Changeset: ${URL_CHANGESET_ROOT}${REV_NO}\n\n"
+			printf "Changeset: ${URL_CHANGESET_ROOT}${REV_NO}\n"
+            printf "Commit reviewed by: $DEVELOPER_NAME - http://http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/ \n\n"
 		else
 			printf "\n"
 			return 0
