@@ -302,7 +302,7 @@ function commitCode() {
 			printf "Revision: $REV_NO\n"
 			# Revision URL
 			printf "Changeset: ${URL_CHANGESET_ROOT}${REV_NO}\n"
-            printf "Commit reviewed by: $DEVELOPER_NAME - http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/ \n\n"
+            printf "Commit reviewed by $DEVELOPER_NAME: http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/ \n\n"
 		else
 			printf "\n"
 			return 0
