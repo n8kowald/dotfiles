@@ -292,17 +292,23 @@ function commitCode() {
 			printf "\n"
 			OUTPUT=$(svn commit -m "$COMMIT_COMMENT" | tee /dev/tty)
 			TP_URL=$(getTPURL)
-			printf "\n${GREEN}Success!${NORMAL} Make sure you update the TP ticket:\n$TP_URL\n\n"
-			printf "TP ticket comment:\n"
+			printf "\n${GREEN}Success!${NORMAL}\n"
+
 			# Branch URL
 			BRANCH_URL=$(getBranchURL)
-			printf "Branch: $BRANCH_URL\n"
 			# Revision Number
 			REV_NO=$(echo $OUTPUT | grep 'Committed revision' | grep -oEi '[0-9]{5,}' | sed -n '$p')
-			printf "Revision: $REV_NO\n"
-			# Revision URL
-			printf "Changeset: ${URL_CHANGESET_ROOT}${REV_NO}\n"
-            printf "Commit reviewed by $DEVELOPER_NAME: http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/ \n\n"
+
+			TP_COMMENT="<strong>Branch:</strong> $BRANCH_URL<br>"
+			TP_COMMENT="${TP_COMMENT}<strong>Revision:</strong> $REV_NO<br>"
+			TP_COMMENT="${TP_COMMENT}<strong>Changeset:</strong> ${URL_CHANGESET_ROOT}${REV_NO}<br>"
+            TP_COMMENT="${TP_COMMENT}<strong>Commit reviewed by:</strong> $DEVELOPER_NAME http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/"
+
+            # Add comment to Target Process ticket
+            TP_COMMENT_RESULT=$(php ${TP_API_PATH}add-comment.php $TP_AUTH_TOKEN $BRANCH_NO "$TP_COMMENT")
+
+            echo $TP_COMMENT_RESULT
+
 		else
 			printf "\n"
 			return 0
@@ -428,7 +434,7 @@ function newBranch() {
         BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
         read -p "Enter a description of this branch: " DESCRIPTION
         REVISION=$(getHeadRevisionFromBranch $COPY_ROOT)
-        CREATED_FROM="New branch copied from $COPY_ROOT_NAME [r$REVISION]"
+        CREATED_FROM="Branch copied from $COPY_ROOT_NAME [r$REVISION]"
         BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION. $CREATED_FROM"
     else
         BRANCH_COMMENT=${2/ROOT_BRANCH/$COPY_ROOT_NAME}
@@ -443,6 +449,20 @@ function newBranch() {
         svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1 -m "$BRANCH_COMMENT"
         printf "${GREEN}Branch ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
         printf "${URL_BRANCH_ROOT}$1\n\n"
+
+        # Add comment to TP about branch creation
+        NEW_BRANCH_REV=$(getHeadRevisionFromBranch ${URL_BRANCH_ROOT}$1)
+
+        TP_COMMENT="<strong>Branch created:</strong> ${URL_BRANCH_ROOT}$1<br>"
+        TP_COMMENT="$TP_COMMENT<strong>Copied from:</strong> $CREATED_FROM<br>"
+        TP_COMMENT="$TP_COMMENT<strong>Revision:</strong> $NEW_BRANCH_REV"
+
+        # Add branch created to Target Process ticket
+        TP_COMMENT_RESULT=$(php ${TP_API_PATH}add-comment.php $TP_AUTH_TOKEN $BRANCH_NO "$TP_COMMENT")
+
+        echo $TP_COMMENT_RESULT
+
+        printf "\n"
 
         # Change - if comment is passed, it's probably a 'rebaseline': skip the switch ask
         if [[ -z "$2" ]]
