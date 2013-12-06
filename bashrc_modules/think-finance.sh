@@ -334,6 +334,22 @@ function doesRevisionExist()
 export -f doesRevisionExist
 alias dre='doesRevisionExist'
 
+function getHeadRevisionFromBranch()
+{
+	# Check for revision URL
+	if [ $# -eq 0 ]
+	then
+		printf "$MSG_FAIL Branch URL is required.\n$MSG_USAGE ghr $URL_BRANCH_ROOT\n"
+		return 0
+	fi
+
+    HEAD_REVISION="$(svn info $1 | grep 'Revision' | awk '{print $2}')"
+
+    echo $HEAD_REVISION
+}
+export -f getHeadRevisionFromBranch
+alias ghr='getHeadRevisionFromBranch'
+
 # Create new SVN branch based on Trunk
 function newBranch() {
 
@@ -411,7 +427,9 @@ function newBranch() {
     then 
         BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
         read -p "Enter a description of this branch: " DESCRIPTION
-        BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION"
+        REVISION=$(getHeadRevisionFromBranch $COPY_ROOT)
+        CREATED_FROM="New branch copied from $COPY_ROOT_NAME [r$REVISION]"
+        BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION. $CREATED_FROM"
     else
         BRANCH_COMMENT=${2/ROOT_BRANCH/$COPY_ROOT_NAME}
     fi
@@ -671,7 +689,7 @@ function rebaseline()
     fi
 }
 
-# Thanks to Adam Atkins for this great function
+# Thanks to Adam Atkins for this sexy function
 function findBranch() 
 {
     if [ $# -ge 1 ]

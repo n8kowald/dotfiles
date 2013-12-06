@@ -202,9 +202,10 @@ match ErrorMsg '\%>80v.\+'
 :let g:NERDTreeDirArrows=0
 
 " Disable syntastic
-let g:pathogen_disabled = ['syntastic']
+"let g:pathogen_disabled = ['syntastic']
 let g:syntastic_enable_signs=1
 let g:syntastic_check_on_open=1
+let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['css', 'java'] }
 
 " Tell vim where the tags file lives
 :set tags=/var/www/tags
