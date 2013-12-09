@@ -173,6 +173,10 @@ function getTPURL {
 }
 export -f getTPURL
 
+function removePeriodFromEndOfString()
+{
+}
+
 # Commit code
 function commitCode() {
 	# Switch to branch root 
@@ -265,7 +269,6 @@ function commitCode() {
             # Enter review board id
             read -p "Enter the Review Board ID: " RBID
             REVIEWBOARD_ID=$RBID
-            #printf "${YELLOW}${REVIEWBOARD_ID}${NORMAL} entered.\n"
         fi
 
 		BRANCH_NO=$(getBranchNumberFromName $BRANCH)
@@ -282,6 +285,8 @@ function commitCode() {
             fi
         else
             COMMIT_COMMENT=$1
+            # TP ticket comment
+            COMMENT=$1
         fi
 
 		printf "${CYAN}\n$COMMIT_COMMENT${NORMAL}\n\n"
@@ -299,10 +304,15 @@ function commitCode() {
 			# Revision Number
 			REV_NO=$(echo $OUTPUT | grep 'Committed revision' | grep -oEi '[0-9]{5,}' | sed -n '$p')
 
-			TP_COMMENT="<strong>Branch:</strong> $BRANCH_URL<br>"
+            TP_COMMENT="$COMMENT<br><br>"
+			TP_COMMENT="${TP_COMMENT}<strong>Branch:</strong> $BRANCH_URL<br>"
 			TP_COMMENT="${TP_COMMENT}<strong>Revision:</strong> $REV_NO<br>"
 			TP_COMMENT="${TP_COMMENT}<strong>Changeset:</strong> ${URL_CHANGESET_ROOT}${REV_NO}<br>"
-            TP_COMMENT="${TP_COMMENT}<strong>Commit reviewed by:</strong> $DEVELOPER_NAME http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/"
+            # Add reviewboard info if not blank
+            if [ ! -z "$REVIEWBOARD_ID" ]
+            then
+                TP_COMMENT="${TP_COMMENT}<strong>Commit reviewed by:</strong> $DEVELOPER_NAME http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/"
+            fi
 
             # Add comment to Target Process ticket
             TP_COMMENT_RESULT=$(addCommentToTP $BRANCH_NO "$TP_COMMENT")
@@ -421,7 +431,6 @@ function newBranch() {
     COPY_ROOT=${URL_DEVELOP_ROOT}
     COPY_ROOT_NAME="DEVELOP (HEAD)"
 
-    #printf "\n"
     read -p "Choose branch base (1) Develop, (2) Trunk: "
     if [[ $REPLY =~ ^[1]$ ]]
     then
@@ -449,25 +458,18 @@ function newBranch() {
         printf "${GREEN}${COPY_ROOT_NAME}${NORMAL} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
     fi
 
-    # Refactor so argument order doesn't matter
-	#if [[ $2 && $2 = --force ]]
-	#then
-		#svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1
-		#svn info;
-		#return 0
-	#fi
-	#MSG_FORCE="${CYAN}Hint:${NORMAL} To create a branch named '$1', add the --force flag: 'nb $1 --force'\n"
+    # Get the latest revision of the branch we're copying from
+    REVISION=$(getHeadRevisionFromBranch $COPY_ROOT)
 
     # Check comment is passed in the second parameter
     if [[ -z "$2" ]]
     then 
         BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
         read -p "Enter a description of this branch: " DESCRIPTION
-        REVISION=$(getHeadRevisionFromBranch $COPY_ROOT)
         CREATED_FROM="New branch copied from $COPY_ROOT_NAME [r$REVISION]"
         BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION. $CREATED_FROM"
     else
-        BRANCH_COMMENT=${2/ROOT_BRANCH/$COPY_ROOT_NAME}
+        BRANCH_COMMENT="${2/ROOT_BRANCH/$COPY_ROOT_NAME} [r$REVISION]"
     fi
 
     printf "${CYAN}$BRANCH_COMMENT${NORMAL}\n"
