@@ -305,7 +305,7 @@ function commitCode() {
             TP_COMMENT="${TP_COMMENT}<strong>Commit reviewed by:</strong> $DEVELOPER_NAME http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/"
 
             # Add comment to Target Process ticket
-            TP_COMMENT_RESULT=$(php ${TP_API_PATH}add-comment.php $TP_AUTH_TOKEN $BRANCH_NO "$TP_COMMENT")
+            TP_COMMENT_RESULT=$(addCommentToTP $BRANCH_NO "$TP_COMMENT")
 
             echo $TP_COMMENT_RESULT
 
@@ -320,6 +320,36 @@ function commitCode() {
 }
 export -f commitCode
 alias commit='commitCode'
+
+function addCommentToTP()
+{
+	# Check branch number (TPID) and comment given
+	if [ $# -eq 0 ]
+	then
+		printf "$MSG_FAIL Branch number and TP comment required.\n$MSG_USAGE addCommentToTP 123456 \"TP comment\"\n"
+		return 0
+	fi
+
+    if [[ -z "$1" ]]
+    then
+		printf "$MSG_FAIL Branch number is required.\n$MSG_USAGE addCommentToTP 123456 \"TP comment\"\n"
+		return 0
+    fi
+
+    if [[ -z "$2" ]]
+    then
+		printf "$MSG_FAIL Target Process comment (quoted) is required. HTML allowed.\n$MSG_USAGE addCommentToTP 123456 \"TP comment\"\n"
+		return 0
+    fi
+
+    # TP_AUTH_TOKEN: stored in ~/dotfiles/bashrc_modules/think-finance-private.sh
+    TP_COMMENT_RESULT=$(php ${TP_CLASSES_PATH}/helpers/tp-add-comment.php $TP_AUTH_TOKEN $1 "$2")
+
+    echo $TP_COMMENT_RESULT
+}
+export -f addCommentToTP
+alias addTpComment='addCommentToTP'
+
 
 function doesRevisionExist()
 {
@@ -434,7 +464,7 @@ function newBranch() {
         BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
         read -p "Enter a description of this branch: " DESCRIPTION
         REVISION=$(getHeadRevisionFromBranch $COPY_ROOT)
-        CREATED_FROM="Branch copied from $COPY_ROOT_NAME [r$REVISION]"
+        CREATED_FROM="New branch copied from $COPY_ROOT_NAME [r$REVISION]"
         BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION. $CREATED_FROM"
     else
         BRANCH_COMMENT=${2/ROOT_BRANCH/$COPY_ROOT_NAME}
@@ -450,15 +480,14 @@ function newBranch() {
         printf "${GREEN}Branch ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
         printf "${URL_BRANCH_ROOT}$1\n\n"
 
-        # Add comment to TP about branch creation
         NEW_BRANCH_REV=$(getHeadRevisionFromBranch ${URL_BRANCH_ROOT}$1)
 
         TP_COMMENT="<strong>Branch created:</strong> ${URL_BRANCH_ROOT}$1<br>"
-        TP_COMMENT="$TP_COMMENT<strong>Copied from:</strong> $CREATED_FROM<br>"
+        TP_COMMENT="$TP_COMMENT<strong>Origin:</strong> $CREATED_FROM<br>"
         TP_COMMENT="$TP_COMMENT<strong>Revision:</strong> $NEW_BRANCH_REV"
 
         # Add branch created to Target Process ticket
-        TP_COMMENT_RESULT=$(php ${TP_API_PATH}add-comment.php $TP_AUTH_TOKEN $BRANCH_NO "$TP_COMMENT")
+        TP_COMMENT_RESULT=$(addCommentToTP $BRANCH_NO "$TP_COMMENT")
 
         echo $TP_COMMENT_RESULT
 
