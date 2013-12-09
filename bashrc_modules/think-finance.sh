@@ -323,23 +323,23 @@ alias commit='commitCode'
 
 function addCommentToTP()
 {
-	# Check branch number (TPID) and comment given
-	if [ $# -eq 0 ]
-	then
-		printf "$MSG_FAIL Branch number and TP comment required.\n$MSG_USAGE addCommentToTP 123456 \"TP comment\"\n"
-		return 0
-	fi
+    # Check branch number (TPID) and comment given
+    if [ $# -eq 0 ]
+    then
+        printf "$MSG_FAIL Branch number and TP comment required.\n$MSG_USAGE addCommentToTP 123456 \"TP comment\"\n"
+        return 0
+    fi
 
     if [[ -z "$1" ]]
     then
-		printf "$MSG_FAIL Branch number is required.\n$MSG_USAGE addCommentToTP 123456 \"TP comment\"\n"
-		return 0
+        printf "$MSG_FAIL Branch number is required.\n$MSG_USAGE addCommentToTP 123456 \"TP comment\"\n"
+        return 0
     fi
 
     if [[ -z "$2" ]]
     then
-		printf "$MSG_FAIL Target Process comment (quoted) is required. HTML allowed.\n$MSG_USAGE addCommentToTP 123456 \"TP comment\"\n"
-		return 0
+        printf "$MSG_FAIL Target Process comment (quoted) is required. HTML allowed.\n$MSG_USAGE addCommentToTP 123456 \"TP comment\"\n"
+        return 0
     fi
 
     # TP_AUTH_TOKEN: stored in ~/dotfiles/bashrc_modules/think-finance-private.sh
