@@ -342,7 +342,7 @@ function addCommentToTP()
         return 0
     fi
 
-    # TP_AUTH_TOKEN: stored in ~/dotfiles/bashrc_modules/think-finance-private.sh
+    # TP_AUTH_TOKEN and TP_CLASSES_PATH: stored in ~/dotfiles/bashrc_modules/think-finance-private.sh
     TP_COMMENT_RESULT=$(php ${TP_CLASSES_PATH}/helpers/tp-add-comment.php $TP_AUTH_TOKEN $1 "$2")
 
     echo $TP_COMMENT_RESULT
