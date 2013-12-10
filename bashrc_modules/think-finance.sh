@@ -7,14 +7,14 @@
 # Global variables
 EXAMPLE_BRANCH="123456_branch_name_1"
 MSG_USAGE="${YELLOW}Usage:${NORMAL}"
-MSG_FAIL="${RED}[FAIL]${NORMAL}"
+MSG_FAIL="\a${RED}[FAIL]${NORMAL}"
 CURRENT_DIR="${BASH_SOURCE%/*}"
 
 # Source private variables
 if [ -f ${CURRENT_DIR}/think-finance-private.sh ]; then
 	source ${CURRENT_DIR}/think-finance-private.sh
 else
-	printf '[Error] Required Think Finance variables not found.'
+	printf '$MSG_FAIL Required Think Finance variables not found.'
 	return 0
 fi
 
@@ -60,7 +60,7 @@ export LC_ALL=C
 # Bash functions -- mostly SVN wrappers
 
 # Get uncommitted files
-# @depencies: getRootFromDir
+#: @depencies: getRootFromDir
 function hasUncommittedFiles() {
 	local DIR_ROOT=$(getRootFromDir)
 	local UF=$(cd $DIR_ROOT && svn status | wc -l)
@@ -74,7 +74,7 @@ function hasUncommittedFiles() {
 export -f hasUncommittedFiles
 
 # Switch to trunk
-# @depencies: hasUncommittedFiles
+#: @depencies: hasUncommittedFiles
 function switchTrunk() {
 	# Check for uncommitted files
 	if hasUncommittedFiles
@@ -91,7 +91,7 @@ export -f switchTrunk
 alias swt='sites && switchTrunk'
 
 # Switch to develop
-# @depencies: hasUncommittedFiles
+#: @dependencies: hasUncommittedFiles
 function switchDevelop() {
 	# Check for uncommitted files
 	if hasUncommittedFiles
@@ -109,7 +109,7 @@ export -f switchDevelop
 alias swd='sites && switchDevelop'
 
 # Switch SVN branch
-# @depencies: hasUncommittedFiles
+#: @dependencies: hasUncommittedFiles
 function switchBranch() {
 	# Branch name is required
 	if [ $# -eq 0 ]
@@ -162,7 +162,7 @@ function getBranchNumberFromName() {
 export -f getBranchNumberFromName
 
 # Get Branch URL
-# @depencies: getRootFromDir
+#: @dependencies: getRootFromDir
 function getBranchURL() {
 	DIR_ROOT=$(getRootFromDir)
 	echo $(cd $DIR_ROOT && svn info | grep 'URL: ' | grep -oEi 'http.+')
@@ -171,7 +171,7 @@ export -f getBranchURL
 alias wbu=getBranchURL
 
 # Get the Target Process URL associated with the current branch
-# @depencies: getBranchName, getBranchNumberFromName
+#: @dependencies: getBranchName, getBranchNumberFromName
 function getTPURL {
 	BRANCH=$(getBranchName)
 	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
@@ -180,7 +180,7 @@ function getTPURL {
 }
 export -f getTPURL
 
-
+# Removes periods from commit comments that get info added to them
 function removePeriodFromEndOfString()
 {
 	if [ $# -eq 0 ]
@@ -198,9 +198,9 @@ export -f removePeriodFromEndOfString
 
 # Commit code
 #
-# @depencies:   getRootFromDir, getBranchName, getBranchNumberFromName, 
-#               removePeriodFromEndOfString, getTPURL, getBranchURL, 
-#               addCommentToTP
+#: @dependencies:   getRootFromDir, getBranchName, getBranchNumberFromName, 
+#                   removePeriodFromEndOfString, getTPURL, getBranchURL, 
+#                   addCommentToTP
 function commitCode() {
 	# Switch to branch root 
 	DIR_ROOT=$(getRootFromDir)
