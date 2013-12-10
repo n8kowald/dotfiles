@@ -78,7 +78,7 @@ function switchTrunk() {
 	then
 		printf "$MSG_FAIL You have uncommitted files. You must commit these files before switching:\n\n"
 		svn status
-		printf "\n"
+        echo
 		return 0
 	fi
 
@@ -94,7 +94,7 @@ function switchDevelop() {
 	then
 		printf "$MSG_FAIL You have uncommitted files. You must commit these files before switching:\n\n"
 		svn status
-		printf "\n"
+        echo
 		return 0
 	fi
 
@@ -125,7 +125,7 @@ function switchBranch() {
 	then
 		printf "$MSG_FAIL You have uncommitted files. You must commit these files before switching:\n\n"
 		svn status
-		printf "\n"
+        echo
 		return 0
 	fi
 
@@ -173,9 +173,21 @@ function getTPURL {
 }
 export -f getTPURL
 
+
 function removePeriodFromEndOfString()
 {
+	if [ $# -eq 0 ]
+	then
+		printf "$MSG_FAIL String required.\n$MSG_USAGE removePeriodFromEndOfString \"This is a comment.\"\n"
+		return 0
+	fi
+
+    CLEANED=${1/%./}
+
+    echo $CLEANED
 }
+export -f removePeriodFromEndOfString
+
 
 # Commit code
 function commitCode() {
@@ -236,7 +248,7 @@ function commitCode() {
 
 	svn status
 
-	printf "\n"
+    echo
 	read -p "Commit these changes to ${YELLOW}$BRANCH${NORMAL}? (y/n) "
 
 	if [[ $REPLY =~ ^[Yy]$ ]]
@@ -272,7 +284,7 @@ function commitCode() {
         fi
 
 		BRANCH_NO=$(getBranchNumberFromName $BRANCH)
-		printf "\n"
+        echo
 	    if [ $# -eq 0 ]
         then 
             read -p "Enter your commit comment (if defect: add ticket no.): " COMMENT
@@ -281,6 +293,8 @@ function commitCode() {
             # If Developer name and reviewboard id is not blank add it to the commit message
             if [ ! -z "$DEVELOPER_NAME" ] && [ ! -z "$REVIEWBOARD_ID" ]
             then
+                # Remove trailing period, if we're attaching info.
+                COMMIT_COMMENT=$(removePeriodFromEndOfString "$COMMIT_COMMENT")
                 COMMIT_COMMENT="$COMMIT_COMMENT. Reviewed by $DEVELOPER_NAME (RBID: $REVIEWBOARD_ID)."
             fi
         else
@@ -294,7 +308,7 @@ function commitCode() {
 		read -p "Commit with the following comment? (y/n) "
 		if [[ $REPLY =~ ^[Yy]$ ]]
 		then 
-			printf "\n"
+            echo
 			OUTPUT=$(svn commit -m "$COMMIT_COMMENT" | tee /dev/tty)
 			TP_URL=$(getTPURL)
 			printf "\n${GREEN}Success!${NORMAL}\n"
@@ -320,11 +334,11 @@ function commitCode() {
             echo $TP_COMMENT_RESULT
 
 		else
-			printf "\n"
+            echo
 			return 0
 		fi
 	else
-		printf "\n"
+        echo
 		return 0
 	fi
 }
@@ -466,6 +480,10 @@ function newBranch() {
     then 
         BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
         read -p "Enter a description of this branch: " DESCRIPTION
+
+        # Remove trailing period, if that exists
+        DESCRIPTION=$(removePeriodFromEndOfString "$DESCRIPTION")
+
         CREATED_FROM="New branch copied from $COPY_ROOT_NAME [r$REVISION]"
         BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION. $CREATED_FROM"
     else
@@ -492,8 +510,7 @@ function newBranch() {
         TP_COMMENT_RESULT=$(addCommentToTP $BRANCH_NO "$TP_COMMENT")
 
         echo $TP_COMMENT_RESULT
-
-        printf "\n"
+        echo
 
         # Change - if comment is passed, it's probably a 'rebaseline': skip the switch ask
         if [[ -z "$2" ]]
@@ -501,19 +518,19 @@ function newBranch() {
             read -p "Switch to ${YELLOW}$1${NORMAL} now? (y/n) "
             if [[ $REPLY =~ ^[Yy]$ ]]
             then 
-                printf "\n"
+                echo
                 switchBranch $1
                 return 0
             else 
-                printf "\n"
+                echo
                 return 0
             fi
         else
-            printf "\n"
+            echo
             return 0
         fi
     else 
-        printf "\n"
+        echo
         return 0
     fi
 }
@@ -695,7 +712,7 @@ function rebaseline()
     printf "${GREEN}Commit log:${NORMAL} ${THIS_BRANCH}\n"
     echo ${URL_BRANCH_ROOT}${THIS_BRANCH}
     svn log -v --stop-on-copy ${URL_BRANCH_ROOT}${THIS_BRANCH}
-    printf "\n"
+    echo
     read -p "Create ${YELLOW}${NEXT_BRANCH_NAME}${NORMAL} and merge ${GREEN}all commits${NORMAL} from '${CYAN}${THIS_BRANCH}${NORMAL}'? (y/n) "
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
@@ -717,7 +734,7 @@ function rebaseline()
         svn merge --dry-run -r $REVISIONS_TO_MERGE ${URL_BRANCH_ROOT}${THIS_BRANCH}
 
         # Merge for good
-        printf "\n"
+        echo
         read -p "Merge and commit? (y/n) "
         if [[ $REPLY =~ ^[Yy]$ ]]
         then
@@ -725,12 +742,12 @@ function rebaseline()
             # Merge it so!
             svn merge -r $REVISIONS_TO_MERGE ${URL_BRANCH_ROOT}${THIS_BRANCH}
 
-            printf "\n"
+            echo
             # Commit!
             BRANCH_NUM=$(getBranchNumberFromName ${THIS_BRANCH})
             REVISIONS_FOR_COMMENT=$(getRevisionRangeForComment $THIS_BRANCH)
             COMMIT_MSG="#${BRANCH_NUM} comment: Merged revisions [${REVISIONS_FOR_COMMENT}] from ${THIS_BRANCH}"
-            printf "\n"
+            echo
             commit "$COMMIT_MSG" --quiet
         else
             return 0
