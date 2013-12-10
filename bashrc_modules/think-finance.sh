@@ -56,9 +56,11 @@ alias svn-apply-patch="patch -p0 -i $1"
 
 export LC_ALL=C
 
+
 # Bash functions -- mostly SVN wrappers
 
 # Get uncommitted files
+# @depencies: getRootFromDir
 function hasUncommittedFiles() {
 	local DIR_ROOT=$(getRootFromDir)
 	local UF=$(cd $DIR_ROOT && svn status | wc -l)
@@ -72,6 +74,7 @@ function hasUncommittedFiles() {
 export -f hasUncommittedFiles
 
 # Switch to trunk
+# @depencies: hasUncommittedFiles
 function switchTrunk() {
 	# Check for uncommitted files
 	if hasUncommittedFiles
@@ -88,6 +91,7 @@ export -f switchTrunk
 alias swt='sites && switchTrunk'
 
 # Switch to develop
+# @depencies: hasUncommittedFiles
 function switchDevelop() {
 	# Check for uncommitted files
 	if hasUncommittedFiles
@@ -105,6 +109,7 @@ export -f switchDevelop
 alias swd='sites && switchDevelop'
 
 # Switch SVN branch
+# @depencies: hasUncommittedFiles
 function switchBranch() {
 	# Branch name is required
 	if [ $# -eq 0 ]
@@ -157,6 +162,7 @@ function getBranchNumberFromName() {
 export -f getBranchNumberFromName
 
 # Get Branch URL
+# @depencies: getRootFromDir
 function getBranchURL() {
 	DIR_ROOT=$(getRootFromDir)
 	echo $(cd $DIR_ROOT && svn info | grep 'URL: ' | grep -oEi 'http.+')
@@ -165,6 +171,7 @@ export -f getBranchURL
 alias wbu=getBranchURL
 
 # Get the Target Process URL associated with the current branch
+# @depencies: getBranchName, getBranchNumberFromName
 function getTPURL {
 	BRANCH=$(getBranchName)
 	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
@@ -190,6 +197,10 @@ export -f removePeriodFromEndOfString
 
 
 # Commit code
+#
+# @depencies:   getRootFromDir, getBranchName, getBranchNumberFromName, 
+#               removePeriodFromEndOfString, getTPURL, getBranchURL, 
+#               addCommentToTP
 function commitCode() {
 	# Switch to branch root 
 	DIR_ROOT=$(getRootFromDir)
@@ -210,7 +221,7 @@ function commitCode() {
         QUIET=1
 	fi
 
-	# Prompt about PHP Code Sniffer if that exists
+    # Prompt about PHP Code Sniffing the committed PHP files, if that exists
 	if [[ $QUIET -eq 0 ]] && type -p phpcs > /dev/null;
 	then
 		PHP_FILES=$(echo $STATUS | tr ' ' '\n' | grep -E '*.php')
@@ -219,30 +230,32 @@ function commitCode() {
 		then
 			printf "${CYAN}${PHP_FILES}${NORMAL}\n"
 			read -p "Run PHP Code Sniffer on these PHP files? (y/n) "
-				if [[ $REPLY =~ ^[Yy]$ ]]
-				then
-					# Convert newlines to spaces
-					ssv=$(echo $PHP_FILES | tr '\n' ' ')
-					FAILED=0
-					for f in $ssv
-					do
-						OUTPUT=$(phpcs $f | tee /dev/tty)
-						ERRORS=$(echo $OUTPUT | grep 'ERROR')
-						if [[ $ERRORS ]]
-						then 
-							FAILED=1
-						fi
-					done
-					# Success
-					if [[ $FAILED -eq 1 ]]
-					then
-						printf "$MSG_FAIL Code failed coding standards check. Fix, then recommit.\n"
-						return 0
-					else
-						printf "${GREEN}Success! Code meets the coding standard.${NORMAL}\n\n"
-					fi
 
-				fi
+            if [[ $REPLY =~ ^[Yy]$ ]]
+            then
+                # Convert newlines to spaces
+                ssv=$(echo $PHP_FILES | tr '\n' ' ')
+                FAILED=0
+                for f in $ssv
+                do
+                    OUTPUT=$(phpcs $f | tee /dev/tty)
+                    ERRORS=$(echo $OUTPUT | grep 'ERROR')
+                    if [[ $ERRORS ]]
+                    then 
+                        FAILED=1
+                    fi
+                done
+
+                # Success
+                if [[ $FAILED -eq 1 ]]
+                then
+                    printf "$MSG_FAIL Code failed coding standards check. Fix, then recommit.\n"
+                    return 0
+                else
+                    printf "${GREEN}Success! Code meets the coding standard.${NORMAL}\n\n"
+                fi
+
+            fi
 		fi
 	fi
 
