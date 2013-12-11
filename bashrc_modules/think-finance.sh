@@ -497,7 +497,7 @@ function newBranch() {
         # Remove trailing period, if that exists
         DESCRIPTION=$(removePeriodFromEndOfString "$DESCRIPTION")
 
-        CREATED_FROM="New branch copied from $COPY_ROOT_NAME [r$REVISION]"
+        CREATED_FROM="Branch copied from $COPY_ROOT_NAME [r$REVISION]"
         BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION. $CREATED_FROM"
     else
         BRANCH_COMMENT="${2/ROOT_BRANCH/$COPY_ROOT_NAME} [r$REVISION]"
