@@ -212,7 +212,7 @@ function commitCode() {
 	if [[ -z  $STATUS ]]
 	then
 		printf "There's nothing to commit.\n"
-		return 0
+		return 1
 	fi
 
     QUIET=0
@@ -250,7 +250,7 @@ function commitCode() {
                 if [[ $FAILED -eq 1 ]]
                 then
                     printf "$MSG_FAIL Code failed coding standards check. Fix, then recommit.\n"
-                    return 0
+                    return 1
                 else
                     printf "${GREEN}Success! Code meets the coding standard.${NORMAL}\n\n"
                 fi
@@ -487,6 +487,7 @@ function newBranch() {
 
     # Get the latest revision of the branch we're copying from
     REVISION=$(getHeadRevisionFromBranch $COPY_ROOT)
+    CREATED_FROM="Branch copied from $COPY_ROOT_NAME [r$REVISION]"
 
     # Check comment is passed in the second parameter
     if [[ -z "$2" ]]
@@ -496,8 +497,6 @@ function newBranch() {
 
         # Remove trailing period, if that exists
         DESCRIPTION=$(removePeriodFromEndOfString "$DESCRIPTION")
-
-        CREATED_FROM="Branch copied from $COPY_ROOT_NAME [r$REVISION]"
         BRANCH_COMMENT="#$BRANCH_NO comment: $DESCRIPTION. $CREATED_FROM"
     else
         BRANCH_COMMENT="${2/ROOT_BRANCH/$COPY_ROOT_NAME} [r$REVISION]"
@@ -515,7 +514,8 @@ function newBranch() {
 
         NEW_BRANCH_REV=$(getHeadRevisionFromBranch ${URL_BRANCH_ROOT}$1)
 
-        TP_COMMENT="<strong>Branch created:</strong> ${URL_BRANCH_ROOT}$1<br>"
+        TP_COMMENT="$BRANCH_COMMENT<br>"
+        TP_COMMENT="$TP_COMMENT<strong>Branch created:</strong> ${URL_BRANCH_ROOT}$1<br>"
         TP_COMMENT="$TP_COMMENT<strong>Origin:</strong> $CREATED_FROM<br>"
         TP_COMMENT="$TP_COMMENT<strong>Revision:</strong> $NEW_BRANCH_REV"
 

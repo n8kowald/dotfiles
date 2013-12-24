@@ -87,6 +87,11 @@ function tmh {
     printf "${YELLOW}Kill session:${NORMAL} tmux kill-session -t tmux-config\n"
 }
 
+function seizure
+{
+    yes "$(seq 231 -1 16)" | while read i; do printf "\x1b[48;5;${i}m\n"; sleep .02; done
+}
+
 export LANG=en_US.UTF-8
 
 # save all the histories
