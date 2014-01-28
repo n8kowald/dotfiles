@@ -38,6 +38,10 @@ alias restart_apache='sudo /etc/init.d/crond stop && sudo service httpd stop && 
 alias restart_mysql='sudo /sbin/service mysql restart'
 alias ephpi='sudo vim /etc/php.ini'
 alias eac='sudo vim /etc/httpd/conf/httpd.conf'
+alias zend_log='sudo tail -f /var/log/messages'
+alias clear_cache='sudo rm -rf /var/www/html/public/mobile/cache/*'
+alias env_switch_dev='sudo cp /etc/httpd/conf/httpd-dev.conf /etc/httpd/conf/httpd.conf && restart_apache && echo Environment switched to ${CYAN}development${NORMAL}'
+alias env_switch_prod='sudo cp /etc/httpd/conf/httpd-prod.conf /etc/httpd/conf/httpd.conf && clear_cache && restart_apache && echo Environment switched to ${RED}production${NORMAL}'
 
 # Tmux
 # Because I'm dumb
@@ -514,7 +518,7 @@ function newBranch() {
 
         NEW_BRANCH_REV=$(getHeadRevisionFromBranch ${URL_BRANCH_ROOT}$1)
 
-        TP_COMMENT="$BRANCH_COMMENT<br>"
+        TP_COMMENT="$BRANCH_COMMENT<br><br>"
         TP_COMMENT="$TP_COMMENT<strong>Branch created:</strong> ${URL_BRANCH_ROOT}$1<br>"
         TP_COMMENT="$TP_COMMENT<strong>Origin:</strong> $CREATED_FROM<br>"
         TP_COMMENT="$TP_COMMENT<strong>Revision:</strong> $NEW_BRANCH_REV"
