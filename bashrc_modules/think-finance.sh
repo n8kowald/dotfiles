@@ -32,6 +32,8 @@ alias tools='cd /var/www/html/public/tools'
 alias layouts='cd /var/www/html/application/layouts/scripts'
 alias tests='cd /var/www/html/tests'
 alias sql='cd /var/www/html/sql'
+alias cronjobs='cd /var/www/html/public/Cronjobs/'
+
 alias lb='svn ls ${URL_BRANCH_ROOT} --verbose'
 alias mb='lb | grep nkowald'
 alias restart_apache='sudo /etc/init.d/crond stop && sudo service httpd stop && sudo service httpd start && sudo /etc/init.d/crond start'
@@ -169,7 +171,7 @@ export -f getBranchNumberFromName
 #: @dependencies: getRootFromDir
 function getBranchURL() {
 	DIR_ROOT=$(getRootFromDir)
-	echo $(cd $DIR_ROOT && svn info | grep 'URL: ' | grep -oEi 'http.+')
+	echo $(cd $DIR_ROOT && svn info | grep 'URL: ' | awk '{print $2}')
 }
 export -f getBranchURL
 alias wbu=getBranchURL
@@ -447,7 +449,7 @@ function newBranch() {
 	# Check branch name starts with [0-9]_
 	if ! [[ $1 =~ [0-9]_.+ ]]
 	then
-		printf "$MSG_FAIL Branch names need to start with their associated Target Process number.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n"
+		printf "$MSG_FAIL Branch names need to start with their Target Process number.\n$MSG_USAGE nb $EXAMPLE_BRANCH\n"
 		return 0
 	fi
 
@@ -803,17 +805,6 @@ function findBranch()
 }
 export -f findBranch
 alias fb='findBranch'
-
-# tmux aliases
-# Create or attach to a sessions named with the current branch.
-# Thanks to Ben Johnson for this!
-function tmuxSessionFromBranch()
-{
-    BRANCH=$(getBranchName)
-    tmux attach -t $BRANCH || tmux new -s $BRANCH
-}
-export -f tmuxSessionFromBranch
-alias tm='tmuxSessionFromBranch'
 
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
 export SVN_EDITOR=vim
