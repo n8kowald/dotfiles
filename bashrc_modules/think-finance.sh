@@ -18,22 +18,23 @@ else
 	return 0
 fi
 
-# Aliases
+#------------------------- Aliases -----------------------------#
+# Directory changing
 alias sites='cd /var/www/html/'
 alias views='cd /var/www/html/application/views/scripts'
 alias controllers='cd /var/www/html/application/controllers'
 alias services='cd /var/www/html/application/services'
 alias models='cd /var/www/html/application/models/DbTable'
 alias styles='cd /var/www/html/public/mobile/css'
-alias images='cd /var/www/html/public/mobile/images'
 alias js='cd /var/www/html/public/mobile/scripts'
+alias images='cd /var/www/html/public/mobile/images'
 alias comms='cd /var/www/html/public/common/lib/customer_comms'
 alias tools='cd /var/www/html/public/tools'
 alias layouts='cd /var/www/html/application/layouts/scripts'
 alias tests='cd /var/www/html/tests'
 alias sql='cd /var/www/html/sql'
 alias cronjobs='cd /var/www/html/public/Cronjobs/'
-
+# Utilities
 alias lb='svn ls ${URL_BRANCH_ROOT} --verbose'
 alias mb='lb | grep nkowald'
 alias restart_apache='sudo /etc/init.d/crond stop && sudo service httpd stop && sudo service httpd start && sudo /etc/init.d/crond start'
@@ -44,21 +45,16 @@ alias zend_log='sudo tail -f /var/log/messages'
 alias clear_cache='sudo rm -rf /var/www/html/public/mobile/cache/*'
 alias env_switch_dev='sudo cp /etc/httpd/conf/httpd-dev.conf /etc/httpd/conf/httpd.conf && restart_apache && echo Environment switched to ${CYAN}development${NORMAL}'
 alias env_switch_prod='sudo cp /etc/httpd/conf/httpd-prod.conf /etc/httpd/conf/httpd.conf && clear_cache && restart_apache && echo Environment switched to ${RED}production${NORMAL}'
-
-# Tmux
-# Because I'm dumb
-alias tmuch='tmux'
-
-# Removal shortcut aliases
 alias rm-kenshoo='sudo rm -rf ./public/Cronjobs/kenshoo/csv_reports/csv_*'
 alias rm-uploaded-docs='sudo rm -rf ./public/members/uploadeddocs/*'
-
 # SVN shotcut aliases
 alias svn-add-unstaged="svn st | grep '^?' | awk '{print $2}' | xargs svn add"
 alias svn-remove-unstaged="svn st | grep '^?' | awk '{print $2}' | xargs rm -rf"
 alias svn-revert-all="svn st | grep -e '^M' | awk '{print $2}' | xargs svn revert"
 alias svn-make-patch="svn diff > $1"
-alias svn-apply-patch="patch -p0 -i $1" 
+alias svn-apply-patch="patch -p0 -i $1"
+# Because I'm dumb
+alias tmuch='tmux'
 
 export LC_ALL=C
 
@@ -67,13 +63,14 @@ export LC_ALL=C
 
 # Get uncommitted files
 #: @depencies: getRootFromDir
-function hasUncommittedFiles() {
+function hasUncommittedFiles()
+{
 	local DIR_ROOT=$(getRootFromDir)
 	local UF=$(cd $DIR_ROOT && svn status | wc -l)
 	if [ $UF -gt 0 ]
 	then
 		return 0
-	else 
+	else
 		return 1
 	fi
 }
@@ -81,7 +78,8 @@ export -f hasUncommittedFiles
 
 # Switch to trunk
 #: @depencies: hasUncommittedFiles
-function switchTrunk() {
+function switchTrunk()
+{
 	# Check for uncommitted files
 	if hasUncommittedFiles
 	then
@@ -97,8 +95,9 @@ export -f switchTrunk
 alias swt='sites && switchTrunk'
 
 # Switch to develop
-#: @dependencies: hasUncommittedFiles
-function switchDevelop() {
+# @dependencies: hasUncommittedFiles
+function switchDevelop()
+{
 	# Check for uncommitted files
 	if hasUncommittedFiles
 	then
@@ -115,8 +114,9 @@ export -f switchDevelop
 alias swd='sites && switchDevelop'
 
 # Switch SVN branch
-#: @dependencies: hasUncommittedFiles
-function switchBranch() {
+# @dependencies: doesBranchExist, hasUncommittedFiles
+function switchBranch()
+{
 	# Branch name is required
 	if [ $# -eq 0 ]
 	then
@@ -147,14 +147,17 @@ export -f switchBranch
 alias sb='sites && switchBranch'
 
 # Get the name of the current branch
+# @dependencies: getRootFromDir
 alias wb='getBranchName'
-function getBranchName() {
+function getBranchName()
+{
 	DIR_ROOT=$(getRootFromDir)
 	echo $(cd $DIR_ROOT && svn info | grep 'URL:' | grep -oEi '[^/]+$')
 }
 export -f getBranchName
 
-function getBranchNumberFromName() {
+function getBranchNumberFromName()
+{
 	# Check for branch name
 	if [ $# -eq 0 ]
 	then
@@ -168,8 +171,9 @@ function getBranchNumberFromName() {
 export -f getBranchNumberFromName
 
 # Get Branch URL
-#: @dependencies: getRootFromDir
-function getBranchURL() {
+# @dependencies: getRootFromDir
+function getBranchURL()
+{
 	DIR_ROOT=$(getRootFromDir)
 	echo $(cd $DIR_ROOT && svn info | grep 'URL: ' | awk '{print $2}')
 }
@@ -177,8 +181,9 @@ export -f getBranchURL
 alias wbu=getBranchURL
 
 # Get the Target Process URL associated with the current branch
-#: @dependencies: getBranchName, getBranchNumberFromName
-function getTPURL {
+# @dependencies: getBranchName, getBranchNumberFromName
+function getTPURL
+{
 	BRANCH=$(getBranchName)
 	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
 
@@ -204,11 +209,12 @@ export -f removePeriodFromEndOfString
 
 # Commit code
 #
-#: @dependencies:   getRootFromDir, getBranchName, getBranchNumberFromName, 
-#                   removePeriodFromEndOfString, getTPURL, getBranchURL, 
-#                   addCommentToTP
-function commitCode() {
-	# Switch to branch root 
+# @dependencies: getRootFromDir, getBranchName, getBranchNumberFromName,
+#                 removePeriodFromEndOfString, getTPURL, getBranchURL,
+#                 addCommentToTP
+function commitCode()
+{
+	# Switch to branch root
 	DIR_ROOT=$(getRootFromDir)
 	cd $DIR_ROOT
 
@@ -247,7 +253,7 @@ function commitCode() {
                     OUTPUT=$(phpcs $f | tee /dev/tty)
                     ERRORS=$(echo $OUTPUT | grep 'ERROR')
                     if [[ $ERRORS ]]
-                    then 
+                    then
                         FAILED=1
                     fi
                 done
@@ -272,7 +278,7 @@ function commitCode() {
 
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
-        
+
         DEVELOPER_NAME=""
         REVIEWBOARD_ID=""
 
@@ -305,10 +311,10 @@ function commitCode() {
 		BRANCH_NO=$(getBranchNumberFromName $BRANCH)
         echo
 	    if [ $# -eq 0 ]
-        then 
+        then
             read -p "Enter your commit comment (if defect: add ticket no.): " COMMENT
 
-		    COMMIT_COMMENT="#$BRANCH_NO comment: $COMMENT" 
+		    COMMIT_COMMENT="#$BRANCH_NO comment: $COMMENT"
             # If Developer name and reviewboard id is not blank add it to the commit message
             if [ ! -z "$DEVELOPER_NAME" ] && [ ! -z "$REVIEWBOARD_ID" ]
             then
@@ -326,7 +332,7 @@ function commitCode() {
 
 		read -p "Commit with the following comment? (y/n) "
 		if [[ $REPLY =~ ^[Yy]$ ]]
-		then 
+		then
             echo
 			OUTPUT=$(svn commit -m "$COMMIT_COMMENT" | tee /dev/tty)
 			TP_URL=$(getTPURL)
@@ -430,8 +436,8 @@ export -f getHeadRevisionFromBranch
 alias ghr='getHeadRevisionFromBranch'
 
 # Create new SVN branch based on Trunk
-function newBranch() {
-
+function newBranch()
+{
 	# Check for branch name
 	if [ $# -eq 0 ]
 	then
@@ -497,7 +503,7 @@ function newBranch() {
 
     # Check comment is passed in the second parameter
     if [[ -z "$2" ]]
-    then 
+    then
         BRANCH_NO=$(echo $1 | grep -oEi ^[0-9]+)
         read -p "Enter a description of this branch: " DESCRIPTION
 
@@ -512,7 +518,7 @@ function newBranch() {
 
     read -p "Create a new branch from ${GREEN}${COPY_ROOT_NAME}${NORMAL} with this commit comment? (y/n) "
     if [[ $REPLY =~ ^[Yy]$ ]]
-    then 
+    then
         # Create the branch
         svn copy ${COPY_ROOT} ${URL_BRANCH_ROOT}$1 -m "$BRANCH_COMMENT"
         printf "${GREEN}Branch ${CYAN}$1${NORMAL} ${GREEN}created successfully.${NORMAL}\n";
@@ -536,11 +542,11 @@ function newBranch() {
         then
             read -p "Switch to ${YELLOW}$1${NORMAL} now? (y/n) "
             if [[ $REPLY =~ ^[Yy]$ ]]
-            then 
+            then
                 echo
                 switchBranch $1
                 return 0
-            else 
+            else
                 echo
                 return 0
             fi
@@ -548,7 +554,7 @@ function newBranch() {
             echo
             return 0
         fi
-    else 
+    else
         echo
         return 0
     fi
@@ -560,11 +566,11 @@ alias nb='sites && newBranch'
 function getRootFromDir()
 {
 	# Default
-	ROOT='/var/www/html'			
-	
+	ROOT='/var/www/html'
+
 	# If we're inside /tools
 	if [[ $(pwd | grep '/tools') ]]
-	then 
+	then
 		ROOT='/var/www/html/public/tools'
 	fi
 
@@ -713,7 +719,7 @@ function getNextBranchName()
     BRANCH_WITH_VERSION_NUM=$(echo $BRANCH_NAME | grep -o '.*_[0-9]$')
     if [[ -z $BRANCH_WITH_VERSION_NUM ]]
     then
-        NEXT_BRANCH_NAME=$(getBranchName)_${NEXT_VERSION_NUM}    
+        NEXT_BRANCH_NAME=$(getBranchName)_${NEXT_VERSION_NUM}
     else
         NEXT_BRANCH_NAME=$(getBranchName | grep -o '.*_')${NEXT_VERSION_NUM}
     fi
@@ -777,7 +783,7 @@ function rebaseline()
 }
 
 # Thanks to Adam Atkins for this sexy function
-function findBranch() 
+function findBranch()
 {
     if [ $# -ge 1 ]
     then
@@ -806,6 +812,7 @@ function findBranch()
 export -f findBranch
 alias fb='findBranch'
 
+
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
 export SVN_EDITOR=vim
 
@@ -816,4 +823,3 @@ fi
 if [ -f /etc/bash_completion.d/nb ]; then
 	. /etc/bash_completion.d/nb
 fi
-
