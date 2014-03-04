@@ -56,7 +56,7 @@ alias restart_apache='sudo /etc/init.d/crond stop && sudo service httpd stop && 
 alias restart_mysql='sudo /sbin/service mysql restart'
 alias ephpi='sudo vim /etc/php.ini'
 alias eac='sudo vim /etc/httpd/conf/httpd.conf'
-alias zend_log='sudo tail -f /var/log/messages'
+alias zend_log='sudo tail -F /var/log/messages |while read -r line;do printf "\e[38;5;%dm%s\e[0m\n" $(($RANDOM%255)) "$line";done'
 alias clear_cache='sudo rm -rf /var/www/html/public/mobile/cache/*'
 alias env_switch_dev='sudo cp /etc/httpd/conf/httpd-dev.conf /etc/httpd/conf/httpd.conf && restart_apache && echo Environment switched to ${CYAN}development${NORMAL}'
 alias env_switch_prod='sudo cp /etc/httpd/conf/httpd-prod.conf /etc/httpd/conf/httpd.conf && clear_cache && restart_apache && echo Environment switched to ${RED}production${NORMAL}'
@@ -406,8 +406,8 @@ function addCommentToTP()
         return 0
     fi
 
-    # TP_AUTH_TOKEN and TP_CLASSES_PATH: stored in ~/dotfiles/bashrc_modules/think-finance-private.sh
-    TP_COMMENT_RESULT=$(php ${TP_CLASSES_PATH}/helpers/tp-add-comment.php $TP_AUTH_TOKEN $1 "$2")
+    # TP_AUTH_TOKEN stored in ~/think-finance/think-finance-private.sh
+    TP_COMMENT_RESULT=$(php $HOME/think-finance/tools/helpers/tp-add-comment.php $TP_AUTH_TOKEN $1 "$2")
 
     echo $TP_COMMENT_RESULT
 }
