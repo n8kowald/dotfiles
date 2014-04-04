@@ -4,6 +4,8 @@
 # Think Finance Specific Bash
 #----------------------------------
 
+#TODO: install this https://github.com/sstephenson/bats and create tests.
+
 # Colours!
 BLACK=$(tput setaf 0)
 RED=$(tput setaf 1)
@@ -826,6 +828,30 @@ function findBranch()
 }
 export -f findBranch
 alias fb='findBranch'
+
+# Check if string is a palindrome (for Fish trophy message)
+function isPalindrome()
+{
+    if [ $# -ge 1 ]
+    then
+        if [ "$(echo $1 | rev)" = "$1" ]
+        then
+            return 1
+        else
+            return 0
+        fi
+    fi
+}
+function getPalindromeMessage()
+{
+    MESSAGE=''
+    if [ $# -ge 1 ]
+    then
+        if [ $(isPalindrome $1) ] 
+        then
+            MESSAGE='Congratulations! You just won a Fish trophy for having a palindromic ReviewBoard ID'
+    fi
+}
 
 
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
