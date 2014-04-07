@@ -866,6 +866,7 @@ function getPalindromeMessage()
         if [ $(isPalindrome $1) ] 
         then
             MESSAGE='Congratulations! You just won a Fish trophy for having a palindromic ReviewBoard ID'
+        fi
     fi
 }
 
