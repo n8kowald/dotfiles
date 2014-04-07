@@ -487,7 +487,7 @@ function newBranch()
     COPY_ROOT=${URL_DEVELOP_ROOT}
     COPY_ROOT_NAME="DEVELOP (HEAD)"
 
-    read -p "Choose branch base (1) Develop, (2) Trunk: "
+    read -p "Choose branch base: (1) Develop, (2) Trunk, (3) Branch: "
     if [[ $REPLY =~ ^[1]$ ]]
     then
         read -p "Enter revision number of Develop to branch from, OR (0) for HEAD: " REVISION
@@ -507,11 +507,27 @@ function newBranch()
             COPY_ROOT_NAME="DEVELOP @ r${REVISION}"
             printf "${GREEN}${COPY_ROOT_NAME}${NORMAL} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
         fi
+
     elif [[ $REPLY =~ ^[2]$ ]]
     then
         COPY_ROOT=${URL_TRUNK_ROOT}
         COPY_ROOT_NAME="TRUNK"
         printf "${GREEN}${COPY_ROOT_NAME}${NORMAL} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
+
+    elif [[ $REPLY =~ ^[3]$ ]]
+    then
+        read -p "Enter branch name to copy from: " BRANCH_NAME
+        # Check branch exists
+        if [[ $(doesBranchExist $BRANCH_NAME) != 'yes' ]]
+        then
+            printf "$MSG_FAIL branch '${URL_BRANCH_ROOT}$BRANCH_NAME' doesn't exist\n"
+            return 0
+        fi
+
+        COPY_ROOT=${URL_BRANCH_ROOT}$BRANCH_NAME
+        COPY_ROOT_NAME=$BRANCH_NAME
+        printf "${GREEN}${COPY_ROOT_NAME}${NORMAL} chosen (${YELLOW}${COPY_ROOT}${NORMAL})\n"
+
     fi
 
     # Get the latest revision of the branch we're copying from
