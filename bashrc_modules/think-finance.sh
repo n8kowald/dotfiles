@@ -872,10 +872,10 @@ function getPalindromeMessage()
 
 function getBranchHistory()
 {
-    echo $(grep 'nb\|sb' ~/.bash_history | awk '{print $2}' | uniq | sort) | tr ' ' '\n'
+    echo $(grep 'nb\|sb' ~/.bash_history | awk '{print $2}' | uniq | sort)
 }
 export -f getBranchHistory
-alias bh='getBranchHistory'
+alias bh='getBranchHistory | tr " " "\n"'
 
 
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
