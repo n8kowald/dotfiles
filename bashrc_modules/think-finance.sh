@@ -870,6 +870,13 @@ function getPalindromeMessage()
     fi
 }
 
+function getBranchHistory()
+{
+    echo $(grep 'nb\|sb' ~/.bash_history | awk '{print $2}' | uniq | sort)
+}
+export -f getBranchHistory
+alias bh='getBranchHistory'
+
 
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
 export SVN_EDITOR=vim
