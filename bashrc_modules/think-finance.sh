@@ -872,7 +872,7 @@ function getPalindromeMessage()
 
 function getBranchHistory()
 {
-    echo $(grep 'nb\|sb' ~/.bash_history | awk '{print $2}' | uniq | sort)
+    echo $(grep 'nb\|sb' ~/.bash_history | awk '{print $2}' | uniq | sort) | tr ' ' '\n'
 }
 export -f getBranchHistory
 alias bh='getBranchHistory'
