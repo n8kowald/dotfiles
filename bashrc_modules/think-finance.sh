@@ -887,8 +887,7 @@ function getPalindromeMessage()
 function getBranchHistory()
 {
     # TODO: Use isValidBranchName as a filter
-    echo $(grep 'nb\|sb' ~/.bash_history | awk '{print $2}' | grep -v
-    'grep\|nb\|sb' | uniq | sort)
+    echo $(grep 'nb\|sb' ~/.bash_history | awk '{print $2}' | grep -v 'grep\|nb\|sb' | uniq | sort)
 }
 export -f getBranchHistory
 alias bh='getBranchHistory | tr " " "\n"'
