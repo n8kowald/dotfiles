@@ -465,8 +465,7 @@ function isValidBranchName()
 	# Check branch name starts with [0-9]_
 	if ! [[ $1 =~ [0-9]_.+ ]]
 	then
-		printf "$MSG_FAIL Branch names need to start with their Target Process
-        number.\n"
+		printf "$MSG_FAIL Branch names need to start with their Target Process number.\n"
 		return 0
 	fi
 
