@@ -483,7 +483,7 @@ function isValidBranchName()
 # Create new SVN branch based on Trunk
 function newBranch()
 {
-    if [ $(isValidBranchName $1) -eq 0 ]
+    if [[ $(isValidBranchName $1) -eq 0 ]]
     then
         printf "$MSG_USAGE nb $EXAMPLE_BRANCH\n";
         return 0
