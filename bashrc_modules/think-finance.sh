@@ -452,41 +452,32 @@ function getHeadRevisionFromBranch()
 export -f getHeadRevisionFromBranch
 alias ghr='getHeadRevisionFromBranch'
 
-# Check if the branch name given is valid.
-function isValidBranchName()
+# Create new SVN branch based on Trunk
+function newBranch()
 {
 	# Check for branch name
 	if [ $# -eq 0 ]
 	then
 		printf "$MSG_FAIL New branch name is required.\n"
-		return 0
+        printf "$MSG_USAGE nb $EXAMPLE_BRANCH\n";
+        return 0
 	fi
 
 	# Check branch name starts with [0-9]_
 	if ! [[ $1 =~ [0-9]_.+ ]]
 	then
 		printf "$MSG_FAIL Branch names need to start with their Target Process number.\n"
-		return 0
+        printf "$MSG_USAGE nb $EXAMPLE_BRANCH\n";
+        return 0
 	fi
 
 	# Check branch name ends in _[1-9]
 	if ! [[ $1 =~ .+_[0-9]{1,2}$ ]]
 	then
 		printf "$MSG_FAIL Branch names need to end in a version number _1.\n"
-		return 0
-	fi
-
-    return 1
-}
-
-# Create new SVN branch based on Trunk
-function newBranch()
-{
-    if [[ $(isValidBranchName $1) -ne 1 ]]
-    then
         printf "$MSG_USAGE nb $EXAMPLE_BRANCH\n";
         return 0
-    fi
+	fi
 
     # Check branch exists
     if [[ $(doesBranchExist $1) == 'yes' ]]
@@ -885,7 +876,6 @@ function getPalindromeMessage()
 
 function getBranchHistory()
 {
-    # TODO: Use isValidBranchName as a filter
     echo $(grep 'nb\|sb' ~/.bash_history | awk '{print $2}' | grep -v 'grep\|nb\|sb' | uniq | sort)
 }
 export -f getBranchHistory
