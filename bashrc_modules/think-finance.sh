@@ -22,10 +22,10 @@ REVERSE=$(tput smso)
 UNDERLINE=$(tput smul)
 
 # Global variables
-EXAMPLE_BRANCH="123456_branch_name_1"
-MSG_USAGE="${YELLOW}Usage:${NORMAL}"
-MSG_FAIL="\a${RED}[FAIL]${NORMAL}"
-CURRENT_DIR="${BASH_SOURCE%/*}"
+readonly EXAMPLE_BRANCH="123456_branch_name_1"
+readonly MSG_USAGE="${YELLOW}Usage:${NORMAL}"
+readonly MSG_FAIL="\a${RED}[FAIL]${NORMAL}"
+readonly CURRENT_DIR="${BASH_SOURCE%/*}"
 
 # Source private variables
 if [ -f ${CURRENT_DIR}/think-finance-private.sh ]; then
@@ -70,11 +70,8 @@ alias svn-remove-unstaged="svn st | grep '^?' | awk '{print $2}' | xargs rm -rf"
 alias svn-revert-all="svn st | grep -e '^M' | awk '{print $2}' | xargs svn revert"
 alias svn-make-patch="svn diff > $1"
 alias svn-apply-patch="patch -p0 -i $1"
-# Because I'm dumb
-alias tmuch='tmux'
 
 export LC_ALL=C
-
 
 # Bash functions -- mostly SVN wrappers
 
@@ -181,8 +178,8 @@ function getBranchNumberFromName()
 		printf "$MSG_FAIL Branch name is required.\n$MSG_USAGE getBranchNumberFromName $EXAMPLE_BRANCH\n"
 		return 0
 	fi
-	BRANCH=$1
-	BRANCH_NO=$(echo $BRANCH | grep -oEi '^[^_]+')
+	local BRANCH=$1
+	local BRANCH_NO=$(echo $BRANCH | grep -oEi '^[^_]+')
 	echo $BRANCH_NO
 }
 export -f getBranchNumberFromName
@@ -191,7 +188,7 @@ export -f getBranchNumberFromName
 # @dependencies: getRootFromDir
 function getBranchURL()
 {
-	DIR_ROOT=$(getRootFromDir)
+	local DIR_ROOT=$(getRootFromDir)
 	echo $(cd $DIR_ROOT && svn info | grep 'URL: ' | awk '{print $2}')
 }
 export -f getBranchURL
@@ -201,8 +198,8 @@ alias wbu=getBranchURL
 # @dependencies: getBranchName, getBranchNumberFromName
 function getTPURL
 {
-	BRANCH=$(getBranchName)
-	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
+	local BRANCH=$(getBranchName)
+	local BRANCH_NO=$(getBranchNumberFromName $BRANCH)
 
 	echo ${URL_TP_TICKET_ROOT}${BRANCH_NO}
 }
@@ -217,7 +214,7 @@ function removePeriodFromEndOfString()
 		return 0
 	fi
 
-    CLEANED=${1/%./}
+    local CLEANED=${1/%./}
 
     echo $CLEANED
 }
@@ -232,11 +229,11 @@ export -f removePeriodFromEndOfString
 function commitCode()
 {
 	# Switch to branch root
-	DIR_ROOT=$(getRootFromDir)
+	local DIR_ROOT=$(getRootFromDir)
 	cd $DIR_ROOT
 
-	BRANCH=$(getBranchName)
-	STATUS=$(svn status | grep -Eo '[a-z].*')
+	local BRANCH=$(getBranchName)
+	local STATUS=$(svn status | grep -Eo '[a-z].*')
 	# If there are no files to commit, say so and exit
 	if [[ -z  $STATUS ]]
 	then
@@ -253,8 +250,8 @@ function commitCode()
     # Prompt about PHP Code Sniffing the committed PHP files, if that exists
 	if [[ $QUIET -eq 0 ]] && type -p phpcs > /dev/null;
 	then
-		PHP_FILES=$(echo $STATUS | tr ' ' '\n' | grep -E '*.php')
-		NO_FILES=$(echo $PHP_FILES | grep -v '^\s*$' | wc -l)
+		local PHP_FILES=$(echo $STATUS | tr ' ' '\n' | grep -E '*.php')
+		local NO_FILES=$(echo $PHP_FILES | grep -v '^\s*$' | wc -l)
 		if [[ $NO_FILES -gt 0 && $PHP_FILES ]]
 		then
 			printf "${CYAN}${PHP_FILES}${NORMAL}\n"
@@ -296,8 +293,8 @@ function commitCode()
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
 
-        DEVELOPER_NAME=""
-        REVIEWBOARD_ID=""
+        local DEVELOPER_NAME=""
+        local REVIEWBOARD_ID=""
 
         read -p "Has this commit been peer reviewed? (y/n) "
         if [[ $REPLY =~ ^[Yy]$ ]]
@@ -325,7 +322,7 @@ function commitCode()
             REVIEWBOARD_ID=$RBID
         fi
 
-		BRANCH_NO=$(getBranchNumberFromName $BRANCH)
+		local BRANCH_NO=$(getBranchNumberFromName $BRANCH)
         echo
 	    if [ $# -eq 0 ]
         then
@@ -445,7 +442,7 @@ function getHeadRevisionFromBranch()
 		return 0
 	fi
 
-    HEAD_REVISION="$(svn info $1 | grep 'Revision' | awk '{print $2}')"
+    local HEAD_REVISION="$(svn info $1 | grep 'Revision' | awk '{print $2}')"
 
     echo $HEAD_REVISION
 }
