@@ -22,10 +22,10 @@ REVERSE=$(tput smso)
 UNDERLINE=$(tput smul)
 
 # Global variables
-readonly EXAMPLE_BRANCH="123456_branch_name_1"
-readonly MSG_USAGE="${YELLOW}Usage:${NORMAL}"
-readonly MSG_FAIL="\a${RED}[FAIL]${NORMAL}"
-readonly CURRENT_DIR="${BASH_SOURCE%/*}"
+EXAMPLE_BRANCH="123456_branch_name_1"
+MSG_USAGE="${YELLOW}Usage:${NORMAL}"
+MSG_FAIL="\a${RED}[FAIL]${NORMAL}"
+CURRENT_DIR="${BASH_SOURCE%/*}"
 
 # Source private variables
 if [ -f ${CURRENT_DIR}/think-finance-private.sh ]; then
