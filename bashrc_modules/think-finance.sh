@@ -79,8 +79,8 @@ export LC_ALL=C
 #: @depencies: getRootFromDir
 function hasUncommittedFiles()
 {
-	local DIR_ROOT=$(getRootFromDir)
-	local UF=$(cd $DIR_ROOT && svn status | wc -l)
+	DIR_ROOT=$(getRootFromDir)
+	UF=$(cd $DIR_ROOT && svn status | wc -l)
 	if [ $UF -gt 0 ]
 	then
 		return 0
@@ -178,8 +178,8 @@ function getBranchNumberFromName()
 		printf "$MSG_FAIL Branch name is required.\n$MSG_USAGE getBranchNumberFromName $EXAMPLE_BRANCH\n"
 		return 0
 	fi
-	local BRANCH=$1
-	local BRANCH_NO=$(echo $BRANCH | grep -oEi '^[^_]+')
+	BRANCH=$1
+	BRANCH_NO=$(echo $BRANCH | grep -oEi '^[^_]+')
 	echo $BRANCH_NO
 }
 export -f getBranchNumberFromName
@@ -188,7 +188,7 @@ export -f getBranchNumberFromName
 # @dependencies: getRootFromDir
 function getBranchURL()
 {
-	local DIR_ROOT=$(getRootFromDir)
+	DIR_ROOT=$(getRootFromDir)
 	echo $(cd $DIR_ROOT && svn info | grep 'URL: ' | awk '{print $2}')
 }
 export -f getBranchURL
@@ -198,8 +198,8 @@ alias wbu=getBranchURL
 # @dependencies: getBranchName, getBranchNumberFromName
 function getTPURL
 {
-	local BRANCH=$(getBranchName)
-	local BRANCH_NO=$(getBranchNumberFromName $BRANCH)
+	BRANCH=$(getBranchName)
+	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
 
 	echo ${URL_TP_TICKET_ROOT}${BRANCH_NO}
 }
@@ -214,7 +214,7 @@ function removePeriodFromEndOfString()
 		return 0
 	fi
 
-    local CLEANED=${1/%./}
+    CLEANED=${1/%./}
 
     echo $CLEANED
 }
@@ -229,11 +229,11 @@ export -f removePeriodFromEndOfString
 function commitCode()
 {
 	# Switch to branch root
-	local DIR_ROOT=$(getRootFromDir)
+	DIR_ROOT=$(getRootFromDir)
 	cd $DIR_ROOT
 
-	local BRANCH=$(getBranchName)
-	local STATUS=$(svn status | grep -Eo '[a-z].*')
+	BRANCH=$(getBranchName)
+	STATUS=$(svn status | grep -Eo '[a-z].*')
 	# If there are no files to commit, say so and exit
 	if [[ -z  $STATUS ]]
 	then
@@ -250,8 +250,8 @@ function commitCode()
     # Prompt about PHP Code Sniffing the committed PHP files, if that exists
 	if [[ $QUIET -eq 0 ]] && type -p phpcs > /dev/null;
 	then
-		local PHP_FILES=$(echo $STATUS | tr ' ' '\n' | grep -E '*.php')
-		local NO_FILES=$(echo $PHP_FILES | grep -v '^\s*$' | wc -l)
+		PHP_FILES=$(echo $STATUS | tr ' ' '\n' | grep -E '*.php')
+		NO_FILES=$(echo $PHP_FILES | grep -v '^\s*$' | wc -l)
 		if [[ $NO_FILES -gt 0 && $PHP_FILES ]]
 		then
 			printf "${CYAN}${PHP_FILES}${NORMAL}\n"
@@ -293,8 +293,8 @@ function commitCode()
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
 
-        local DEVELOPER_NAME=""
-        local REVIEWBOARD_ID=""
+        DEVELOPER_NAME=""
+        REVIEWBOARD_ID=""
 
         read -p "Has this commit been peer reviewed? (y/n) "
         if [[ $REPLY =~ ^[Yy]$ ]]
@@ -322,7 +322,7 @@ function commitCode()
             REVIEWBOARD_ID=$RBID
         fi
 
-		local BRANCH_NO=$(getBranchNumberFromName $BRANCH)
+		BRANCH_NO=$(getBranchNumberFromName $BRANCH)
         echo
 	    if [ $# -eq 0 ]
         then
@@ -442,7 +442,7 @@ function getHeadRevisionFromBranch()
 		return 0
 	fi
 
-    local HEAD_REVISION="$(svn info $1 | grep 'Revision' | awk '{print $2}')"
+    HEAD_REVISION="$(svn info $1 | grep 'Revision' | awk '{print $2}')"
 
     echo $HEAD_REVISION
 }
