@@ -821,7 +821,7 @@ function findBranch()
     if [ $# -ge 1 ]
     then
         sites
-        branchArr=($(svn ls https://trac.fg123.co.uk/svn/elastic/branches | grep "$1"))
+        branchArr=($(svn ls ${URL_BRANCH_ROOT} | grep "$1"))
         NUM=0
         for branch in ${!branchArr[@]}; do
             ((NUM++))
