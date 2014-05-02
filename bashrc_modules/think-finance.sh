@@ -880,16 +880,20 @@ alias bh='getBranchHistory | tr " " "\n"'
 
 function createPostReviewWithInfo()
 {
+	# Switch to branch root
+	DIR_ROOT=$(getRootFromDir)
+	cd $DIR_ROOT
+
 	BRANCH_URL=$(getBranchURL)
 	BRANCH=$(getBranchName)
 	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
 
     read -p "Enter a Review Board summary: " SUMMARY
     RB_SUMMARY="#${BRANCH_NO} - $SUMMARY"
-	printf "Summary: ${CYAN}${RB_SUMMARY}${NORMAL}\n"
+	printf "Summary: ${CYAN}${RB_SUMMARY}${NORMAL}\n\n"
 
     read -p "Enter a Review Board description: " DESCRIPTION
-	printf "Description: ${CYAN}${DESCRIPTION}${NORMAL}\n"
+	printf "Description: ${CYAN}${DESCRIPTION}${NORMAL}\n\n"
 
     read -p "Create code review with the following comment? (y/n) "
     if [[ $REPLY =~ ^[Yy]$ ]]
