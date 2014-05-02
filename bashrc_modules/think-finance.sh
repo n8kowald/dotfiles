@@ -885,11 +885,11 @@ function createPostReviewWithInfo()
 	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
 
     read -p "Enter a Review Board summary: " SUMMARY
-    RB_SUMMARY="#${BRANCH_NO} - $RBSUMMARY"
-	printf "Summary: ${CYAN}\n$RB_SUMMARY${NORMAL}\n"
+    RB_SUMMARY="#${BRANCH_NO} - $SUMMARY"
+	printf "Summary: ${CYAN}$RB_SUMMARY${NORMAL}\n"
 
     read -p "Enter a Review Board description: " DESCRIPTION
-	printf "Description: ${CYAN}\n$DESCRIPTION${NORMAL}\n"
+	printf "Description: ${CYAN}$DESCRIPTION${NORMAL}\n"
 
     read -p "Create code review with the following comment? (y/n) "
     if [[ $REPLY =~ ^[Yy]$ ]]
