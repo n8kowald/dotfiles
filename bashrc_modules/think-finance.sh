@@ -880,7 +880,7 @@ alias bh='getBranchHistory | tr " " "\n"'
 
 function createPostReviewWithInfo()
 {
-    BRANCH_URL=$(getBranchUrl)
+	BRANCH_URL=$(getBranchURL)
 	BRANCH=$(getBranchName)
 	BRANCH_NO=$(getBranchNumberFromName $BRANCH)
 
@@ -892,7 +892,7 @@ function createPostReviewWithInfo()
     post-review --branch=$BRANCH_URL --summary=$RB_SUMMARY --description=$DESCRIPTION
 }
 export -f createPostReviewWithInfo
-alias cpr='createPostReviewWithInfo'
+alias ccr='createPostReviewWithInfo'
 
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
 export SVN_EDITOR=vim
