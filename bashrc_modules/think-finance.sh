@@ -886,10 +886,20 @@ function createPostReviewWithInfo()
 
     read -p "Enter a Review Board summary: " SUMMARY
     RB_SUMMARY="#${BRANCH_NO} - $RBSUMMARY"
+	printf "Summary: ${CYAN}\n$RB_SUMMARY${NORMAL}\n"
 
     read -p "Enter a Review Board description: " DESCRIPTION
+	printf "Description: ${CYAN}\n$DESCRIPTION${NORMAL}\n"
 
-    post-review --branch=$BRANCH_URL --summary=$RB_SUMMARY --description=$DESCRIPTION
+    read -p "Create code review with the following comment? (y/n) "
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        post-review --branch=$BRANCH_URL --summary="$RB_SUMMARY" --description="$DESCRIPTION"
+    else
+        echo
+        return 0
+    fi
+
 }
 export -f createPostReviewWithInfo
 alias ccr='createPostReviewWithInfo'
