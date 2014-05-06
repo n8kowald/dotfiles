@@ -613,6 +613,12 @@ function getRootFromDir()
         ROOT='/var/www/loans/public'
     fi
 
+    # If we're in /var/www/loans
+	if [[ $(pwd | grep '/www/compare') ]]
+    then
+        ROOT='/var/www/compare/public'
+    fi
+
 	echo $ROOT
 }
 export -f getRootFromDir
