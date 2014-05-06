@@ -610,7 +610,7 @@ function getRootFromDir()
     # If we're in /var/www/loans
 	if [[ $(pwd | grep '/www/loans') ]]
     then
-        ROOT='/var/www/html/loans/public'
+        ROOT='/var/www/loans/public'
     fi
 
 	echo $ROOT
