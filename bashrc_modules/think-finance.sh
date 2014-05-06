@@ -607,6 +607,12 @@ function getRootFromDir()
 		ROOT='/var/www/html/public/tools'
 	fi
 
+    # If we're in /var/www/loans
+	if [[ $(pwd | grep '/www/loans') ]]
+    then
+        ROOT='/var/www/html/loans/public'
+    fi
+
 	echo $ROOT
 }
 export -f getRootFromDir
