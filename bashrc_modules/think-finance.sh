@@ -370,7 +370,7 @@ function commitCode()
             # Add comment to Target Process ticket
             TP_COMMENT_RESULT=$(addCommentToTP $BRANCH_NO "$TP_COMMENT")
 
-            echo $TP_COMMENT_RESULT
+            echo -e $TP_COMMENT_RESULT
 
 		else
             echo
