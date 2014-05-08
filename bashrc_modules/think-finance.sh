@@ -408,7 +408,7 @@ function addCommentToTP()
     # TP_AUTH_TOKEN stored in ~/think-finance/think-finance-private.sh
     TP_COMMENT_RESULT=$(php $HOME/think-finance/tools/helpers/tp-add-comment.php $TP_AUTH_TOKEN $1 "$2")
 
-    echo $TP_COMMENT_RESULT
+    printf $TP_COMMENT_RESULT
 }
 export -f addCommentToTP
 alias addTpComment='addCommentToTP'
