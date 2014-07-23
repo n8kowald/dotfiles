@@ -364,7 +364,7 @@ function commitCode()
             # Add reviewboard info if not blank
             if [ ! -z "$REVIEWBOARD_ID" ]
             then
-                TP_COMMENT="${TP_COMMENT}<strong>Commit reviewed by:</strong> $DEVELOPER_NAME http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/"
+                TP_COMMENT="${TP_COMMENT}<strong>Code review by:</strong> $DEVELOPER_NAME http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/"
             fi
 
             # Add comment to Target Process ticket
