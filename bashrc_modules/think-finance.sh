@@ -128,7 +128,7 @@ export -f switchDevelop
 alias swd='sites && switchDevelop'
 
 # Switch SVN branch
-# @dependencies: doesBranchExist, hasUncommittedFiles
+# @dependencies: doesSVNPathExist, hasUncommittedFiles
 function switchBranch()
 {
 	# Branch name is required
@@ -139,7 +139,7 @@ function switchBranch()
 	fi
 
     # Check branch exists
-    if [[ $(doesBranchExist $1) != 'yes' ]]
+    if [[ $(doesSVNPathExist $1) != 'yes' ]]
     then
         printf "$MSG_FAIL branch '${URL_BRANCH_ROOT}$1' doesn't exist\n"
         return 0
@@ -367,6 +367,19 @@ function commitCode()
                 TP_COMMENT="${TP_COMMENT}<strong>Code review by:</strong> $DEVELOPER_NAME http://reviewboard.uk.paydayone.com/r/$REVIEWBOARD_ID/"
             fi
 
+            # Append Apply/Revert comment if SQL changed
+            SQL_FILES=$(echo $STATUS | tr ' ' '\n' | grep -E '*.sql')
+            NO_FILES=$(echo $SQL_FILES | grep -v '^\s*$' | wc -l)
+            if [[ $NO_FILES -gt 0 && $SQL_FILES ]]
+            then
+                SQL_APPLY=$(getSQLApplyURL $SQL_FILES)
+                SQL_ROLLBACK=$(getSQLRollbackURL $SQL_FILES)
+
+                TP_COMMENT="${TP_COMMENT}<br><br>Contains SQL changes:<br><br>"
+                TP_COMMENT="${TP_COMMENT}<strong>Rollback:</strong> ${SQL_ROLLBACK}"
+                TP_COMMENT="${TP_COMMENT}<strong>Apply:</strong> ${SQL_APPLY}"
+            fi
+
             # Add comment to Target Process ticket
             TP_COMMENT_RESULT=$(addCommentToTP $BRANCH_NO "$TP_COMMENT")
 
@@ -383,6 +396,80 @@ function commitCode()
 }
 export -f commitCode
 alias commit='commitCode'
+
+function getSQLApplyURL()
+{
+    # Check SQL files provided
+    if [ $# -eq 0 ]
+    then
+        printf "$MSG_FAIL SQL changes required.\n$MSG_USAGE getSQLApplyURL sql/123456_test_update.sql\n"
+        return 0
+    fi
+
+    # Get svn branch URL
+    SQL_ROOT=$(getBranchURL)
+    SQL_APPLY=""
+    SQL_FILES=$(echo $SQL_FILES | tr ' ' '\n')
+
+    for sql in $SQL_FILES
+    do
+        # Skip item if this is a revert/rollback script
+        FOUND=$(echo $sql | grep -oEi *rollback\|revert*)
+        if [ -n "$FOUND" ]; then
+            continue
+        fi
+        SQL_APPLY="${SQL_APPLY}${SQL_ROOT}/$sql<br>"
+    done
+
+    echo $SQL_APPLY
+}
+export -f getSQLApplyURL
+
+function getSQLRollbackURL()
+{
+    # Check SQL files provided
+    if [ $# -eq 0 ]
+    then
+        printf "$MSG_FAIL SQL changes required.\n$MSG_USAGE getSQLRollbackURL sql/123456_test_update.sql\n"
+        return 0
+    fi
+
+    SQL_ROLLBACK=""
+
+    # Get branch root
+    BRANCH_ROOT=$(wbu)/
+    SQL_FILES=$(echo $SQL_FILES | tr ' ' '\n')
+
+    for sql in $SQL_FILES
+    do
+        # Skip item if this is a revert/rollback script
+        FOUND=$(echo $sql | grep -oEi *rollback\|revert*)
+        if [ -n "$FOUND" ]; then
+            continue
+        fi
+
+        # Strip the .sql extension tag
+        SQL_APPLY=${sql/\.sql/}
+
+        # Check rollback exists
+        SQL_ROLLBACK_DETECT=${SQL_APPLY}-rollback.sql
+        if [ -f $SQL_ROLLBACK_DETECT ]; then
+
+            # Rollback exists!
+            SQL_ROLLBACK="${SQL_ROLLBACK}${BRANCH_ROOT}$SQL_ROLLBACK_DETECT<br>"
+        else
+            SQL_REVERT_DETECT=${SQL_APPLY}-revert.sql
+            if [ -f $SQL_REVERT_DETECT ]; then
+
+                # Revert exists!
+                SQL_ROLLBACK="${SQL_ROLLBACK}${BRANCH_ROOT}${SQL_REVERT_DETECT}<br>"
+            fi
+        fi
+    done
+
+    echo ${SQL_ROLLBACK}
+}
+export -f getSQLRollbackURL
 
 function addCommentToTP()
 {
@@ -477,7 +564,7 @@ function newBranch()
 	fi
 
     # Check branch exists
-    if [[ $(doesBranchExist $1) == 'yes' ]]
+    if [[ $(doesSVNPathExist $1) == 'yes' ]]
     then
         printf "$MSG_FAIL Branch ${YELLOW}$1${NORMAL} already exists!\n"
         return 0
@@ -518,7 +605,7 @@ function newBranch()
     then
         read -p "Enter branch name to copy from: " BRANCH_NAME
         # Check branch exists
-        if [[ $(doesBranchExist $BRANCH_NAME) != 'yes' ]]
+        if [[ $(doesSVNPathExist $BRANCH_NAME) != 'yes' ]]
         then
             printf "$MSG_FAIL branch '${URL_BRANCH_ROOT}$BRANCH_NAME' doesn't exist\n"
             return 0
@@ -623,7 +710,7 @@ function getRootFromDir()
 }
 export -f getRootFromDir
 
-function doesBranchExist()
+function doesSVNPathExist()
 {
 	# Check for branch name given
 	if [ $# -eq 0 ]
@@ -639,8 +726,8 @@ function doesBranchExist()
         echo "no"
     fi
 }
-export -f doesBranchExist
-alias be='sites && doesBranchExist'
+export -f doesSVNPathExist
+alias be='sites && doesSVNPathExist'
 
 function getVersionNumber()
 {
@@ -922,7 +1009,7 @@ function createPostReviewWithInfo()
 export -f createPostReviewWithInfo
 alias ccr='createPostReviewWithInfo'
 
-export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/bin/phpunit
+export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/local/bin/phpunit
 
 # source custom bash autocompletions
 if [ -f /etc/bash_completion.d/sb ]; then
