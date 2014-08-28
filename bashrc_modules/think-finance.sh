@@ -999,7 +999,7 @@ function createPostReviewWithInfo()
     read -p "Create code review with the following comment? (y/n) "
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
-        post-review --branch=$BRANCH_URL --bugs-closed="$BRANCH_NO" --summary="$RB_SUMMARY" --description="$DESCRIPTION"
+        rbt post --branch=$BRANCH_URL --bugs-closed="$BRANCH_NO" --summary="$RB_SUMMARY" --description="$DESCRIPTION"
     else
         echo
         return 0
