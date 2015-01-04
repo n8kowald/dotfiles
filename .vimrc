@@ -12,6 +12,8 @@ set ignorecase		" case-insensitive searching
 set splitright		" place new split in the right hand side
 set hlsearch		" highlight searched phrases.
 set incsearch		" highlight as you search
+set synmaxcol=512   " max characters Vim will highlight per line
+
 filetype plugin indent on			" filetype detection
 syntax on		" syntax highlighting on
 
@@ -68,7 +70,7 @@ endfunction
 
 function! TabSpacesON()
 	set list
-		set listchars=tab:>·,trail:·,nbsp:·
+		set listchars=tab:>.,trail:.,nbsp:.
 		endfunction
 
 function! TabSpacesOFF()
@@ -191,7 +193,18 @@ endfunction
 nnoremap <f2> :call SeekTrailingWhiteSpace()<cr>
 nnoremap <f3> :call SeekIndentWarningOccurrence()<cr>")"
 
-match ErrorMsg '\%>80v.\+'
+"match ErrorMsg '\%>80v.\+'
+match ErrorMsg '\%<81v.\%>80v'
+
+if has("multi_byte")
+  if &termencoding == ""
+    let &termencoding = &encoding
+  endif
+  set encoding=utf-8
+  setglobal fileencoding=utf-8
+  "setglobal bomb
+  set fileencodings=ucs-bom,utf-8,latin1
+endif
 
 " Changes plugin
 :let g:changes_vcs_check=1
@@ -209,6 +222,6 @@ let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['css', 'jav
 
 " Tell vim where the tags file lives
 :set tags=/var/www/tags
-
+:set tags+=/usr/share/php/Zend/tags
 
 call pathogen#infect()
