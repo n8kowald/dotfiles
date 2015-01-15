@@ -24,8 +24,8 @@ UNDERLINE=$(tput smul)
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
-#alias ls='ls -hF --color=auto'
-alias ls='ls -FH'
+alias ls='ls -hF --color=auto'
+#alias ls='ls -FH'
 alias lsd="ls -l | egrep '^d'"
 alias ebrc='vim ~/.bashrc'
 alias evrc='vim ~/.vimrc'
@@ -117,5 +117,6 @@ export EDITOR=vim
 
 # folders to add to path
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/local/bin/phpunit
+export LD_LIBRARY_PATH=/usr/local/lib
 
 source /home/nkowald/think-finance/tools/bash/think-finance.sh
