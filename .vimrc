@@ -17,11 +17,6 @@ set synmaxcol=512   " max characters Vim will highlight per line
 filetype plugin indent on			" filetype detection
 syntax on		" syntax highlighting on
 
-" set the 't_Co' option in vim to 256 to override the terminfo value
-"if &term == "xterm"
-	set t_Co=256
-"endif
-
 colorscheme jellybeans
 
 " Source the vimrc file after saving it
@@ -89,6 +84,7 @@ endfunction
 
 vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
+vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
 
 "set diffexpr=MyDiff()
 function! MyDiff()
