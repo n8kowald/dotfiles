@@ -14,36 +14,32 @@ BLUE=$(tput setaf 4)
 MAGENTA=$(tput setaf 5)
 CYAN=$(tput setaf 6)
 WHITE=$(tput setaf 7)
-BRIGHT=$(tput bold)
+BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 BLINK=$(tput blink)
 REVERSE=$(tput smso)
 UNDERLINE=$(tput smul)
 
-# Source bash modules
-for script in ~/dotfiles/bashrc_modules/*.sh
-	do
-	# check if the script is executable
-	if [ -x "${script}" ]; then
-		# run the script
-		source ${script}
-	fi
-done
-
 # Aliases
+<<<<<<< HEAD
 alias lsd="ls -l | egrep '^d'"
 alias ebrc='vim ~/.bashrc'
 alias evrc='vim ~/.vimrc'
+=======
+>>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974
 alias fu='sudo $(history -p !-1)'
 alias reload='source ~/.bashrc && echo "Reloaded ~/.bashrc successfully"'
 alias show_aliases="clear && grep -r -h 'alias' ~/dotfiles/ --exclude=.git* --exclude=HEAD* --exclude=master*"
 alias dotfiles='cd ~/dotfiles'
+<<<<<<< HEAD
 alias newsite_root='cd /usr/share/nginx/www/nathan-kowald/symfony2'
 alias newsite_bundle='cd /usr/share/nginx/www/nathan-kowald/symfony2/src/NathanKowald/Bundle/PersonalBundle'
 
 # a better up/down arrow key behaviour
 bind '"\e[A"':history-search-backward
 bind '"\e[B"':history-search-forward
+=======
+>>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974
 
 extract () {
   if [ -f $1 ] ; then
@@ -76,6 +72,13 @@ function gci() {
 }
 export -f gci
 
+# tmux aliases
+alias tls="tmux list-sessions"
+alias tma='tmux attach -t $2'
+if [ -f /etc/bash_completion.d/tma ]; then
+	. /etc/bash_completion.d/tma
+fi
+
 function tmh {
     printf "${YELLOW}New session:${NORMAL} tmux new -s session-name\n"
     printf "${YELLOW}Reopen session:${NORMAL} tmux attach -t session-name\n"
@@ -94,26 +97,47 @@ function wikiLookup()
 alias wl='wikiLookup'
 
 
+function seizure
+{
+    yes "$(seq 231 -1 16)" | while read i; do printf "\x1b[48;5;${i}m\n"; sleep .02; done
+}
+
 export LANG=en_US.UTF-8
 
 # save all the histories
 export HISTFILESIZE=1000000
 export HISTSIZE=1000000
+
 # don't put duplicate lines or empty spaces in the history
 export HISTCONTROL=ignoreboth
+
 # combine multiline commands in history
 shopt -s cmdhist
+
 # merge session histories
 shopt -s histappend
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 #shopt -s checkwinsize
-
-# enable colors
-eval "`dircolors -b`"
- 
+  
+# make the dir command work kinda like in windows (long format)
+alias dir='ls --color=auto --format=long'
+   
 # make grep highlight results using color
 export GREP_OPTIONS='--color=auto'
 
+<<<<<<< HEAD
 PATH=/usr/local/bin/:~/.composer/vendor/bin/:$PATH
+=======
+# Use Vim for the default editor
+export SVN_EDITOR=vim
+export VISUAL=vim
+export EDITOR=vim
+
+# folders to add to path
+export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/local/bin/phpunit
+export LD_LIBRARY_PATH=/usr/local/lib
+
+source /home/nkowald/think-finance/tools/bash/think-finance.sh
+>>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974

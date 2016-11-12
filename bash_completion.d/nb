@@ -1,0 +1,9 @@
+_nb() {
+	branches=$(cd /var/www/html && svn ls https://trac.fg123.co.uk/svn/elastic/branches)
+	# Replace newlines with spaces - for completion
+	str_completions=$(echo $branches | tr '\n' ' ')
+
+	local cur=${COMP_WORDS[COMP_CWORD]}
+    COMPREPLY=( $(compgen -W "$str_completions" -- $cur) )
+}
+complete -F _nb nb

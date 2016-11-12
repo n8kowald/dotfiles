@@ -2,7 +2,13 @@ set nocompatible   " stops vim from behaving in a vi compatible way
 
 set tabstop=4		" how wide the tab is
 set softtabstop=4	" num of spaces a tab counts for when <Tab> or <BS>
+<<<<<<< HEAD
 set shiftwidth=4	" spaces to use for (auto)indent
+=======
+set shiftwidth=4	" spaces to use for autoindent
+set autoindent		" copy indent from current line
+set smartindent		" happy auto indenting
+>>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974
 "set noexpandtab	" use tabs
 set expandtab		" use spaces
 set tabpagemax=15
@@ -13,19 +19,27 @@ set ignorecase		" case-insensitive searching
 set splitright		" place new split in the right hand side
 set hlsearch		" highlight searched phrases.
 set incsearch		" highlight as you search
+<<<<<<< HEAD
 set nu "show line numbers by default
 " Interpret octal numbers as decimal numbers (for intuitive incrementation)
 set nrformats=
+=======
+set synmaxcol=512   " max characters Vim will highlight per line
+
+>>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974
 filetype plugin indent on			" filetype detection
 syntax on		" syntax highlighting on
 cnoremap sudow w !sudo tee % >/dev/null
 let g:netrw_liststyle=3
 
+<<<<<<< HEAD
 " set the 't_Co' option in vim to 256 to override the terminfo value
 if &term == "xterm"
 	set t_Co=256
 endif
 
+=======
+>>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974
 colorscheme jellybeans
 "colorscheme tomorrow-night
 
@@ -77,7 +91,7 @@ endfunction
 
 function! TabSpacesON()
 	set list
-		set listchars=tab:>·,trail:·,nbsp:·
+		set listchars=tab:>.,trail:.,nbsp:.
 		endfunction
 
 function! TabSpacesOFF()
@@ -96,6 +110,7 @@ endfunction
 
 vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
+vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
 
 " Handy Ctrl+r replace function
 vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
@@ -207,7 +222,18 @@ endfunction
 nnoremap <f2> :call SeekTrailingWhiteSpace()<cr>
 nnoremap <f3> :call SeekIndentWarningOccurrence()<cr>")"
 
-match ErrorMsg '\%>80v.\+'
+"match ErrorMsg '\%>80v.\+'
+match ErrorMsg '\%<81v.\%>80v'
+
+if has("multi_byte")
+  if &termencoding == ""
+    let &termencoding = &encoding
+  endif
+  set encoding=utf-8
+  setglobal fileencoding=utf-8
+  "setglobal bomb
+  set fileencodings=ucs-bom,utf-8,latin1
+endif
 
 " Vim Commentary plugin
 "autocmd FileType php set commentstring=\/\/\%s
@@ -224,6 +250,7 @@ match ErrorMsg '\%>80v.\+'
 "let g:pathogen_disabled = ['syntastic']
 let g:syntastic_enable_signs=1
 let g:syntastic_check_on_open=1
+<<<<<<< HEAD
 let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['css','java']}
 
 " Tell vim where the tags file lives
@@ -233,5 +260,12 @@ let g:Powerline_dividers_override = ['>>', '>', '<<', '<']
 
 " Powerline
 set rtp+=$HOME/.local/lib/python2.7/site-packages/powerline/bindings/vim/
+=======
+let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['css', 'java'] }
+
+" Tell vim where the tags file lives
+:set tags=/var/www/tags
+:set tags+=/usr/share/php/Zend/tags
+>>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974
 
 call pathogen#infect()
