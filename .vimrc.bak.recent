@@ -1,25 +1,19 @@
-set nocompatible   " stops vim from behaving in a vi compatible way
+"set nocompatible   " stops vim from behaving in a vi compatible way
 
 set tabstop=4		" how wide the tab is
 set softtabstop=4	" num of spaces a tab counts for when <Tab> or <BS>
 set shiftwidth=4	" spaces to use for (auto)indent
+set autoindent		" copy indent from current line
+set smartindent		" happy auto indenting
 "set noexpandtab	" use tabs
-set expandtab		" use spaces
-set tabpagemax=15
-set autoindent
-set history=200
+set expandtab		" use spaces :*(
 
 set ignorecase		" case-insensitive searching
 set splitright		" place new split in the right hand side
 set hlsearch		" highlight searched phrases.
 set incsearch		" highlight as you search
-set nu "show line numbers by default
-" Interpret octal numbers as decimal numbers (for intuitive incrementation)
-set nrformats=
 filetype plugin indent on			" filetype detection
 syntax on		" syntax highlighting on
-cnoremap sudow w !sudo tee % >/dev/null
-let g:netrw_liststyle=3
 
 " set the 't_Co' option in vim to 256 to override the terminfo value
 if &term == "xterm"
@@ -27,7 +21,6 @@ if &term == "xterm"
 endif
 
 colorscheme jellybeans
-"colorscheme tomorrow-night
 
 au BufNewFile,BufRead *.less set filetype=less
 
@@ -96,9 +89,6 @@ endfunction
 
 vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
-
-" Handy Ctrl+r replace function
-vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
 
 "set diffexpr=MyDiff()
 function! MyDiff()
@@ -209,9 +199,6 @@ nnoremap <f3> :call SeekIndentWarningOccurrence()<cr>")"
 
 match ErrorMsg '\%>80v.\+'
 
-" Vim Commentary plugin
-"autocmd FileType php set commentstring=\/\/\%s
-
 " Changes plugin
 :let g:changes_vcs_check=1
 :let g:changes_vcs_system='svn'
@@ -224,7 +211,6 @@ match ErrorMsg '\%>80v.\+'
 "let g:pathogen_disabled = ['syntastic']
 let g:syntastic_enable_signs=1
 let g:syntastic_check_on_open=1
-let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['css','java']}
 
 " Tell vim where the tags file lives
 

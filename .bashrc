@@ -31,19 +31,19 @@ for script in ~/dotfiles/bashrc_modules/*.sh
 done
 
 # Aliases
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias ls='ls -hF --color=auto'
 alias lsd="ls -l | egrep '^d'"
 alias ebrc='vim ~/.bashrc'
 alias evrc='vim ~/.vimrc'
-alias etf='vim ~/dotfiles/bashrc_modules/think-finance.sh'
 alias fu='sudo $(history -p !-1)'
 alias reload='source ~/.bashrc && echo "Reloaded ~/.bashrc successfully"'
 alias show_aliases="clear && grep -r -h 'alias' ~/dotfiles/ --exclude=.git* --exclude=HEAD* --exclude=master*"
 alias dotfiles='cd ~/dotfiles'
-#alias gh="open `git remote -v | grep fetch | awk '{print $2}' | sed 's/git@/http:\/\//' | sed 's/com:/com\//'`| head -n1"
+alias newsite_root='cd /usr/share/nginx/www/nathan-kowald/symfony2'
+alias newsite_bundle='cd /usr/share/nginx/www/nathan-kowald/symfony2/src/NathanKowald/Bundle/PersonalBundle'
+
+# a better up/down arrow key behaviour
+bind '"\e[A"':history-search-backward
+bind '"\e[B"':history-search-forward
 
 extract () {
   if [ -f $1 ] ; then
@@ -82,6 +82,17 @@ function tmh {
     printf "${YELLOW}Show sessions:${NORMAL} tmux ls\n"
     printf "${YELLOW}Kill session:${NORMAL} tmux kill-session -t tmux-config\n"
 }
+alias tma='tmux attach -t $t'
+if [ -f /etc/bash_completion.d/tma ]; then
+    . /etc/bash_completion.d/tma
+fi
+
+function wikiLookup()
+{
+    dig +short txt $1.wp.dg.cx
+}
+alias wl='wikiLookup'
+
 
 export LANG=en_US.UTF-8
 
@@ -104,3 +115,5 @@ eval "`dircolors -b`"
  
 # make grep highlight results using color
 export GREP_OPTIONS='--color=auto'
+
+PATH=/usr/local/bin/:~/.composer/vendor/bin/:$PATH
