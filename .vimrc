@@ -236,23 +236,13 @@ endif
 " NERDTree plugin
 :let g:NERDTreeDirArrows=0
 
+set rtp+=$HOME/.local/lib/python2.7/site-packages/powerline/bindings/vim/
+"set laststatus=2
+
 " Disable syntastic
 "let g:pathogen_disabled = ['syntastic']
 let g:syntastic_enable_signs=1
 let g:syntastic_check_on_open=1
 let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['css','java']}
-
-" Tell vim where the tags file lives
-
-let g:Powerline_symbols = "unicode"
-let g:Powerline_dividers_override = ['>>', '>', '<<', '<']
-
-" Powerline
-set rtp+=$HOME/.local/lib/python2.7/site-packages/powerline/bindings/vim/
-let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['css', 'java'] }
-
-" Tell vim where the tags file lives
-:set tags=/var/www/tags
-:set tags+=/usr/share/php/Zend/tags
 
 call pathogen#infect()

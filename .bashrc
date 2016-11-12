@@ -129,3 +129,6 @@ export EDITOR=vim
 # folders to add to path
 export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/local/bin/phpunit/usr:~/.composer/vendor/bin/
 export LD_LIBRARY_PATH=/usr/local/lib
+
+# Source personal bashrc
+source ~/dotfiles/bashrc_modules/personal.sh
