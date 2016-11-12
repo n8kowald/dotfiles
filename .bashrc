@@ -21,25 +21,19 @@ REVERSE=$(tput smso)
 UNDERLINE=$(tput smul)
 
 # Aliases
-<<<<<<< HEAD
 alias lsd="ls -l | egrep '^d'"
 alias ebrc='vim ~/.bashrc'
 alias evrc='vim ~/.vimrc'
-=======
->>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974
 alias fu='sudo $(history -p !-1)'
 alias reload='source ~/.bashrc && echo "Reloaded ~/.bashrc successfully"'
 alias show_aliases="clear && grep -r -h 'alias' ~/dotfiles/ --exclude=.git* --exclude=HEAD* --exclude=master*"
 alias dotfiles='cd ~/dotfiles'
-<<<<<<< HEAD
 alias newsite_root='cd /usr/share/nginx/www/nathan-kowald/symfony2'
 alias newsite_bundle='cd /usr/share/nginx/www/nathan-kowald/symfony2/src/NathanKowald/Bundle/PersonalBundle'
 
 # a better up/down arrow key behaviour
 bind '"\e[A"':history-search-backward
 bind '"\e[B"':history-search-forward
-=======
->>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974
 
 extract () {
   if [ -f $1 ] ; then
@@ -127,17 +121,11 @@ alias dir='ls --color=auto --format=long'
 # make grep highlight results using color
 export GREP_OPTIONS='--color=auto'
 
-<<<<<<< HEAD
-PATH=/usr/local/bin/:~/.composer/vendor/bin/:$PATH
-=======
 # Use Vim for the default editor
 export SVN_EDITOR=vim
 export VISUAL=vim
 export EDITOR=vim
 
 # folders to add to path
-export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/local/bin/phpunit
+export PATH=$PATH:/lib/:/lib/node_modules/npm/bin/:/usr/local/bin/phpunit/usr:~/.composer/vendor/bin/
 export LD_LIBRARY_PATH=/usr/local/lib
-
-source /home/nkowald/think-finance/tools/bash/think-finance.sh
->>>>>>> 4e49ed28420a8cb5140d66c990ee9056f7bff974
